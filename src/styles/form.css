@@ -1,0 +1,193 @@
+:root {
+  --cdf-primary: #6366f1;
+  --cdf-primary-hover: #4f46e5;
+  --cdf-primary-light: rgba(99, 102, 241, 0.1);
+  --cdf-error: #ef4444;
+  --cdf-error-light: rgba(239, 68, 68, 0.1);
+  --cdf-bg: #ffffff;
+  --cdf-surface: #f8fafc;
+  --cdf-border: #e2e8f0;
+  --cdf-border-focus: #94a3b8;
+  --cdf-text: #0f172a;
+  --cdf-text-muted: #64748b;
+  --cdf-radius: 12px;
+  --cdf-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --cdf-shadow-focus: 0 0 0 4px rgba(99, 102, 241, 0.15);
+  --cdf-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --cdf-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cdf-form-container {
+  font-family: var(--cdf-font);
+  color: var(--cdf-text);
+  background: var(--cdf-bg);
+  border-radius: var(--cdf-radius);
+  padding: 2rem;
+  box-shadow: var(--cdf-shadow);
+  max-width: 600px;
+  margin: 0 auto;
+  border: 1px solid var(--cdf-border);
+}
+
+.cdf-form-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: var(--cdf-text);
+}
+
+.cdf-field-group {
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.cdf-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: var(--cdf-text);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.cdf-required-mark {
+  color: var(--cdf-error);
+}
+
+.cdf-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.cdf-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.9375rem;
+  font-family: var(--cdf-font);
+  color: var(--cdf-text);
+  background-color: var(--cdf-surface);
+  border: 1px solid var(--cdf-border);
+  border-radius: var(--cdf-radius);
+  transition: var(--cdf-transition);
+  outline: none;
+  box-sizing: border-box;
+}
+
+.cdf-input:hover {
+  border-color: var(--cdf-border-focus);
+}
+
+.cdf-input:focus {
+  border-color: var(--cdf-primary);
+  background-color: var(--cdf-bg);
+  box-shadow: var(--cdf-shadow-focus);
+}
+
+.cdf-input--error {
+  border-color: var(--cdf-error);
+  background-color: var(--cdf-error-light);
+}
+
+.cdf-input--error:focus {
+  border-color: var(--cdf-error);
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15);
+}
+
+.cdf-error-message {
+  font-size: 0.75rem;
+  color: var(--cdf-error);
+  margin-top: 0.375rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.cdf-submit-btn {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: var(--cdf-font);
+  color: #ffffff;
+  background-color: var(--cdf-primary);
+  border: none;
+  border-radius: var(--cdf-radius);
+  cursor: pointer;
+  transition: var(--cdf-transition);
+  margin-top: 1rem;
+  box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.39);
+}
+
+.cdf-submit-btn:hover {
+  background-color: var(--cdf-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+
+.cdf-submit-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 10px rgba(99, 102, 241, 0.3);
+}
+
+/* Rich Text Editor Overrides */
+.cdf-rich-text-wrapper {
+  border: 1px solid var(--cdf-border);
+  border-radius: var(--cdf-radius);
+  overflow: hidden;
+  transition: var(--cdf-transition);
+}
+
+.cdf-rich-text-wrapper:focus-within {
+  border-color: var(--cdf-primary);
+  box-shadow: var(--cdf-shadow-focus);
+}
+
+.cdf-rich-text-toolbar {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  background: var(--cdf-surface);
+  border-bottom: 1px solid var(--cdf-border);
+}
+
+.cdf-toolbar-btn {
+  padding: 0.375rem;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--cdf-text-muted);
+  transition: var(--cdf-transition);
+}
+
+.cdf-toolbar-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--cdf-text);
+}
+
+.cdf-toolbar-btn.is-active {
+  background: var(--cdf-primary-light);
+  color: var(--cdf-primary);
+}
+
+.cdf-rich-text-content {
+  padding: 1rem;
+  min-height: 120px;
+  background: var(--cdf-bg);
+  outline: none;
+}
+
+.cdf-rich-text-content .ProseMirror {
+  outline: none;
+}
+
+.cdf-rich-text-content .ProseMirror p.is-editor-empty:first-child::before {
+  color: var(--cdf-text-muted);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}

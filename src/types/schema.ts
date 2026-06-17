@@ -1,5 +1,13 @@
 export type FieldType = 'string' | 'number' | 'integer' | 'boolean' | 'object' | 'array';
-export type FieldFormat = 'email' | 'password' | 'date' | 'time' | 'uri' | 'rich-text' | string;
+export type FieldFormat =
+  | 'email'
+  | 'password'
+  | 'date'
+  | 'time'
+  | 'uri'
+  | 'rich-text'
+  | 'data-url'
+  | string;
 
 export interface JSONSchema {
   type: FieldType;
@@ -16,4 +24,10 @@ export interface JSONSchema {
   enum?: any[];
   items?: JSONSchema | JSONSchema[];
   default?: any;
+}
+
+export interface UISchema {
+  'ui:widget'?: 'radio' | 'checkboxes' | 'textarea' | 'color' | string;
+  'ui:columnSpan'?: number;
+  [key: string]: any;
 }

@@ -191,3 +191,122 @@
   height: 0;
   pointer-events: none;
 }
+
+/* Grid Layouts */
+.cdf-form-grid-1 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+.cdf-form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+.cdf-form-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.cdf-form-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+
+/* Fix field group margin inside grid */
+.cdf-form-grid-1 > .cdf-field-group,
+.cdf-form-grid-2 > .cdf-field-group,
+.cdf-form-grid-3 > .cdf-field-group,
+.cdf-form-grid-4 > .cdf-field-group {
+  margin-bottom: 0;
+}
+
+/* Select Field */
+.cdf-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+/* Radio and Checkbox Fields */
+.cdf-radio-group,
+.cdf-checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.cdf-radio-label,
+.cdf-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+  color: var(--cdf-text);
+  cursor: pointer;
+}
+
+.cdf-radio-input,
+.cdf-checkbox-input {
+  width: 1.125rem;
+  height: 1.125rem;
+  accent-color: var(--cdf-primary);
+  cursor: pointer;
+  margin: 0;
+}
+
+/* File Field */
+.cdf-file-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  border: 2px dashed var(--cdf-border);
+  border-radius: var(--cdf-radius);
+  background-color: var(--cdf-surface);
+  transition: var(--cdf-transition);
+  text-align: center;
+}
+
+.cdf-file-wrapper:hover,
+.cdf-file-wrapper:focus-within {
+  border-color: var(--cdf-primary);
+  background-color: var(--cdf-primary-light);
+}
+
+.cdf-file-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.cdf-file-text {
+  font-size: 0.875rem;
+  color: var(--cdf-text-muted);
+  pointer-events: none;
+}
+
+.cdf-file-text span {
+  color: var(--cdf-primary);
+  font-weight: 500;
+}
+
+.cdf-file-preview {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--cdf-text);
+  word-break: break-all;
+}

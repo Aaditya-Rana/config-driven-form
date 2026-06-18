@@ -12,7 +12,7 @@ A highly scalable, config-driven React form library that dynamically generates b
 ## Installation
 
 ```bash
-npm install config-driven-form react-hook-form
+npm install config-driven-form
 ```
 
 ## Quick Start

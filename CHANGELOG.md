@@ -1,5 +1,11 @@
 # config-driven-form
 
+## 1.1.2
+
+### Patch Changes
+
+- b21e8be: docs: significantly enhance README with comprehensive examples for new features, uiSchema, and layouts
+
 ## 1.1.1
 
 ### Patch Changes

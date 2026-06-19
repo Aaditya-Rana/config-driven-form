@@ -1,0 +1,71 @@
+import { JSONSchema, UISchema } from '../types/schema';
+
+export type BuilderFieldType =
+  | 'text'
+  | 'number'
+  | 'email'
+  | 'password'
+  | 'rich-text'
+  | 'file'
+  | 'checkbox'
+  | 'checkboxes'
+  | 'select'
+  | 'radio';
+
+export interface FieldDef {
+  id: string; // Internal UUID for drag and drop
+  key: string; // The object property key in JSONSchema
+  type: BuilderFieldType; // The primitive builder type
+  schema: JSONSchema;
+  uiSchema?: UISchema;
+  isRequired?: boolean;
+}
+
+// Initial templates for dropping new fields
+export const FIELD_TEMPLATES: Record<BuilderFieldType, Omit<FieldDef, 'id' | 'key'>> = {
+  text: {
+    type: 'text',
+    schema: { type: 'string', title: 'New Text Field' },
+  },
+  number: {
+    type: 'number',
+    schema: { type: 'number', title: 'New Number Field' },
+  },
+  email: {
+    type: 'email',
+    schema: { type: 'string', format: 'email', title: 'Email Address' },
+  },
+  password: {
+    type: 'password',
+    schema: { type: 'string', format: 'password', title: 'Password' },
+  },
+  'rich-text': {
+    type: 'rich-text',
+    schema: { type: 'string', format: 'rich-text', title: 'Rich Text' },
+  },
+  file: {
+    type: 'file',
+    schema: { type: 'string', format: 'data-url', title: 'File Upload' },
+  },
+  checkbox: {
+    type: 'checkbox',
+    schema: { type: 'boolean', title: 'Checkbox' },
+  },
+  checkboxes: {
+    type: 'checkboxes',
+    schema: {
+      type: 'array',
+      title: 'Multiple Checkboxes',
+      items: { type: 'string', enum: ['Option 1', 'Option 2'] },
+    },
+  },
+  select: {
+    type: 'select',
+    schema: { type: 'string', title: 'Dropdown', enum: ['Option 1', 'Option 2'] },
+  },
+  radio: {
+    type: 'radio',
+    schema: { type: 'string', title: 'Radio Buttons', enum: ['Option 1', 'Option 2'] },
+    uiSchema: { 'ui:widget': 'radio' },
+  },
+};

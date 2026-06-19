@@ -16,6 +16,7 @@ Stop writing thousands of lines of boilerplate form code. Define your data struc
 - 🎨 **Beautiful by Default:** Includes a stunning, modern glassmorphic design system out of the box.
 - 🏗️ **Multi-Column Layouts:** Easily build complex 2, 3, or 4-column grid layouts using the `uiSchema`.
 - 🧩 **Rich Field Types:** Natively supports Text, Numbers, Passwords, Dropdowns, Radios, Checkboxes, File Uploads, and a Tiptap Rich Text Editor!
+- 🏗️ **Visual Form Builder:** Includes a powerful, Strapi-like Drag-and-Drop builder to visually construct schemas and UI schemas without writing code!
 
 ---
 
@@ -184,6 +185,45 @@ export default function TailwindForm() {
 
 ---
 
+## 🏗️ Visual Form Builder (New!)
+
+Tired of writing JSON by hand? We've built a world-class, **Drag-and-Drop Visual Form Builder** directly into the library!
+
+You can embed this builder into your own admin panels, let users visually construct their forms, set validation rules, pick themes, and then save the output as standard `JSONSchema` to store in your database!
+
+```tsx
+import React from 'react';
+import { FormBuilder } from 'config-driven-form';
+import 'config-driven-form/dist/index.css';
+
+export default function AdminFormBuilder() {
+  return (
+    <div style={{ height: '100vh', width: '100vw' }}>
+      <FormBuilder
+        // Optional: Pass existing schemas to edit them!
+        // initialSchema={existingSchema}
+        // initialUiSchema={existingUiSchema}
+        onSave={(schema, uiSchema, formSettings) => {
+          console.log('Generated Schema:', schema);
+          console.log('Generated UI Schema:', uiSchema);
+          console.log('Global Form Settings:', formSettings);
+
+          // Save to your database here!
+        }}
+      />
+    </div>
+  );
+}
+```
+
+### Builder Features:
+
+- **Drag & Drop Canvas:** Powered by `@dnd-kit` for buttery smooth reordering.
+- **Live Preview Mode:** Toggle between Editor and Preview mode to test validation instantly.
+- **Global Theme & Layout Controls:** Let your users pick their brand colors and column layouts visually.
+
+---
+
 ## 📚 Supported Field Types
 
 The library automatically inspects the `type`, `format`, and `enum` properties of your JSON Schema to render the correct UI component:
@@ -221,4 +261,4 @@ The library automatically inspects the `type`, `format`, and `enum` properties o
 
 ## 🤝 Contributing
 
-We welcome contributions! If you want to fix a bug, add a new field type, or improve the documentation, please read our [Developer's Guide (CONTRIBUTING.md)](./CONTRIBUTING.md) to get started with your local development environment.
+We welcome contributions! If you want to fix a bug, add a new field type, or improve the documentation, please read our [Developer's Guide (CONTRIBUTING.md)](https://github.com/Aaditya-Rana/config-driven-form/blob/main/CONTRIBUTING.md) to get started with your local development environment.

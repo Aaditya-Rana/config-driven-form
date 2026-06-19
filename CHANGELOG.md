@@ -1,5 +1,11 @@
 # config-driven-form
 
+## 1.3.0
+
+### Minor Changes
+
+- 0e69528: feat: add visual drag and drop form builder, global theme settings, and fix README contributing links
+
 ## 1.2.0
 
 ### Minor Changes

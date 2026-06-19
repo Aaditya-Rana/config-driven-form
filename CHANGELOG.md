@@ -1,5 +1,11 @@
 # config-driven-form
 
+## 1.2.0
+
+### Minor Changes
+
+- d3e7234: feat: introduce `classNames` API and `ui:classNames` to support Tailwind CSS overrides and custom styling
+
 ## 1.1.2
 
 ### Patch Changes

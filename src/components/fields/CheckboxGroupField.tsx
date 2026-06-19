@@ -1,18 +1,23 @@
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import { JSONSchema } from '../../types/schema';
+import { JSONSchema, UISchema } from '../../types/schema';
+import { useClassNames, cx } from '../ClassNamesContext';
 
 interface CheckboxGroupFieldProps {
   name: string;
   schema: JSONSchema;
+  uiSchema?: UISchema;
   isRequired?: boolean;
 }
 
 export const CheckboxGroupField: React.FC<CheckboxGroupFieldProps> = ({
   name,
   schema,
+  uiSchema,
   isRequired,
 }) => {
+  const globalClasses = useClassNames();
+  const localClasses = uiSchema?.['ui:classNames'] || {};
   const {
     register,
     formState: { errors },
@@ -27,20 +32,37 @@ export const CheckboxGroupField: React.FC<CheckboxGroupFieldProps> = ({
   }
 
   return (
-    <div className="cdf-field-group">
-      <label className="cdf-label">
+    <div className={cx('cdf-field-group', globalClasses.fieldGroup, localClasses.fieldGroup)}>
+      <label className={cx('cdf-label', globalClasses.label, localClasses.label)}>
         {schema.title || name}
         {isRequired && <span className="cdf-required-mark">*</span>}
       </label>
 
-      <div className="cdf-checkbox-group">
+      <div
+        className={cx(
+          'cdf-checkbox-group',
+          globalClasses.checkboxGroup,
+          localClasses.checkboxGroup,
+        )}
+      >
         {options.map((option) => (
-          <label key={option} className="cdf-checkbox-label">
+          <label
+            key={option}
+            className={cx(
+              'cdf-checkbox-label',
+              globalClasses.checkboxLabel,
+              localClasses.checkboxLabel,
+            )}
+          >
             <input
               type="checkbox"
               value={option}
               {...register(name)}
-              className="cdf-checkbox-input"
+              className={cx(
+                'cdf-checkbox-input',
+                globalClasses.checkboxInput,
+                localClasses.checkboxInput,
+              )}
             />
             {option}
           </label>
@@ -48,7 +70,7 @@ export const CheckboxGroupField: React.FC<CheckboxGroupFieldProps> = ({
       </div>
 
       {error && (
-        <span className="cdf-error-message">
+        <span className={cx('cdf-error-message', globalClasses.errorText, localClasses.errorText)}>
           <svg
             width="14"
             height="14"

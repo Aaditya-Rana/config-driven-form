@@ -29,39 +29,60 @@ export const FieldRenderer: React.FC<FieldRendererProps> = ({
   const renderField = () => {
     // Arrays (Checkbox Groups)
     if (schema.type === 'array') {
-      return <CheckboxGroupField name={name} schema={schema} isRequired={isRequired} />;
+      return (
+        <CheckboxGroupField
+          name={name}
+          schema={schema}
+          uiSchema={uiSchema}
+          isRequired={isRequired}
+        />
+      );
     }
 
     // Booleans (Single Checkbox)
     if (schema.type === 'boolean') {
-      return <CheckboxField name={name} schema={schema} isRequired={isRequired} />;
+      return (
+        <CheckboxField name={name} schema={schema} uiSchema={uiSchema} isRequired={isRequired} />
+      );
     }
 
     // Enums (Select vs Radio)
     if (schema.enum) {
       if (widget === 'radio') {
-        return <RadioField name={name} schema={schema} isRequired={isRequired} />;
+        return (
+          <RadioField name={name} schema={schema} uiSchema={uiSchema} isRequired={isRequired} />
+        );
       }
-      return <SelectField name={name} schema={schema} isRequired={isRequired} />;
+      return (
+        <SelectField name={name} schema={schema} uiSchema={uiSchema} isRequired={isRequired} />
+      );
     }
 
     // Strings
     if (schema.type === 'string') {
       if (schema.format === 'data-url') {
-        return <FileField name={name} schema={schema} isRequired={isRequired} />;
+        return (
+          <FileField name={name} schema={schema} uiSchema={uiSchema} isRequired={isRequired} />
+        );
       }
       if (schema.format === 'password') {
-        return <PasswordField name={name} schema={schema} isRequired={isRequired} />;
+        return (
+          <PasswordField name={name} schema={schema} uiSchema={uiSchema} isRequired={isRequired} />
+        );
       }
       if (schema.format === 'rich-text') {
-        return <RichTextField name={name} schema={schema} isRequired={isRequired} />;
+        return (
+          <RichTextField name={name} schema={schema} uiSchema={uiSchema} isRequired={isRequired} />
+        );
       }
-      return <TextField name={name} schema={schema} isRequired={isRequired} />;
+      return <TextField name={name} schema={schema} uiSchema={uiSchema} isRequired={isRequired} />;
     }
 
     // Numbers
     if (schema.type === 'number' || schema.type === 'integer') {
-      return <NumberField name={name} schema={schema} isRequired={isRequired} />;
+      return (
+        <NumberField name={name} schema={schema} uiSchema={uiSchema} isRequired={isRequired} />
+      );
     }
 
     // Fallback

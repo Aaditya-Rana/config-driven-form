@@ -1,14 +1,18 @@
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import { JSONSchema } from '../../types/schema';
+import { JSONSchema, UISchema } from '../../types/schema';
+import { useClassNames, cx } from '../ClassNamesContext';
 
 interface RadioFieldProps {
   name: string;
   schema: JSONSchema;
+  uiSchema?: UISchema;
   isRequired?: boolean;
 }
 
-export const RadioField: React.FC<RadioFieldProps> = ({ name, schema, isRequired }) => {
+export const RadioField: React.FC<RadioFieldProps> = ({ name, schema, uiSchema, isRequired }) => {
+  const globalClasses = useClassNames();
+  const localClasses = uiSchema?.['ui:classNames'] || {};
   const {
     register,
     formState: { errors },
@@ -17,23 +21,31 @@ export const RadioField: React.FC<RadioFieldProps> = ({ name, schema, isRequired
   const error = errors[name];
 
   return (
-    <div className="cdf-field-group">
-      <label className="cdf-label">
+    <div className={cx('cdf-field-group', globalClasses.fieldGroup, localClasses.fieldGroup)}>
+      <label className={cx('cdf-label', globalClasses.label, localClasses.label)}>
         {schema.title || name}
         {isRequired && <span className="cdf-required-mark">*</span>}
       </label>
 
-      <div className="cdf-radio-group">
+      <div className={cx('cdf-radio-group', globalClasses.radioGroup, localClasses.radioGroup)}>
         {schema.enum?.map((option) => (
-          <label key={option} className="cdf-radio-label">
-            <input type="radio" value={option} {...register(name)} className="cdf-radio-input" />
+          <label
+            key={option}
+            className={cx('cdf-radio-label', globalClasses.radioLabel, localClasses.radioLabel)}
+          >
+            <input
+              type="radio"
+              value={option}
+              {...register(name)}
+              className={cx('cdf-radio-input', globalClasses.radioInput, localClasses.radioInput)}
+            />
             {option}
           </label>
         ))}
       </div>
 
       {error && (
-        <span className="cdf-error-message">
+        <span className={cx('cdf-error-message', globalClasses.errorText, localClasses.errorText)}>
           <svg
             width="14"
             height="14"

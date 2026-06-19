@@ -26,8 +26,30 @@ export interface JSONSchema {
   default?: any;
 }
 
+export interface FormClassNames {
+  container?: string;
+  title?: string;
+  description?: string;
+  form?: string;
+  fieldGroup?: string;
+  label?: string;
+  input?: string;
+  inputError?: string;
+  errorText?: string;
+  submitButton?: string;
+  radioGroup?: string;
+  radioLabel?: string;
+  radioInput?: string;
+  checkboxGroup?: string;
+  checkboxLabel?: string;
+  checkboxInput?: string;
+  fileWrapper?: string;
+  fileText?: string;
+}
+
 export interface UISchema {
   'ui:widget'?: 'radio' | 'checkboxes' | 'textarea' | 'color' | string;
   'ui:columnSpan'?: number;
+  'ui:classNames'?: FormClassNames;
   [key: string]: any;
 }

@@ -1,15 +1,19 @@
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import { JSONSchema } from '../../types/schema';
+import { JSONSchema, UISchema } from '../../types/schema';
+import { useClassNames, cx } from '../ClassNamesContext';
 import { AlertCircle } from 'lucide-react';
 
 interface TextFieldProps {
   name: string;
   schema: JSONSchema;
+  uiSchema?: UISchema;
   isRequired?: boolean;
 }
 
-export const TextField: React.FC<TextFieldProps> = ({ name, schema, isRequired }) => {
+export const TextField: React.FC<TextFieldProps> = ({ name, schema, uiSchema, isRequired }) => {
+  const globalClasses = useClassNames();
+  const localClasses = uiSchema?.['ui:classNames'] || {};
   const {
     register,
     formState: { errors },
@@ -17,8 +21,8 @@ export const TextField: React.FC<TextFieldProps> = ({ name, schema, isRequired }
   const error = errors[name];
 
   return (
-    <div className="cdf-field-group">
-      <label className="cdf-label" htmlFor={name}>
+    <div className={cx('cdf-field-group', globalClasses.fieldGroup, localClasses.fieldGroup)}>
+      <label className={cx('cdf-label', globalClasses.label, localClasses.label)} htmlFor={name}>
         {schema.title || name}
         {isRequired && <span className="cdf-required-mark">*</span>}
       </label>
@@ -26,13 +30,20 @@ export const TextField: React.FC<TextFieldProps> = ({ name, schema, isRequired }
         <input
           id={name}
           type={schema.format === 'email' ? 'email' : 'text'}
-          className={`cdf-input ${error ? 'cdf-input--error' : ''}`}
+          className={cx(
+            'cdf-input',
+            globalClasses.input,
+            localClasses.input,
+            error && 'cdf-input--error',
+            error && globalClasses.inputError,
+            error && localClasses.inputError,
+          )}
           placeholder={`Enter ${schema.title || name}`}
           {...register(name)}
         />
       </div>
       {error && (
-        <span className="cdf-error-message">
+        <span className={cx('cdf-error-message', globalClasses.errorText, localClasses.errorText)}>
           <AlertCircle size={14} />
           {error.message as string}
         </span>

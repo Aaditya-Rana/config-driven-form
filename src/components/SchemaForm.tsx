@@ -1,8 +1,9 @@
 import React from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { ajvResolver } from '@hookform/resolvers/ajv';
-import { JSONSchema, UISchema } from '../types/schema';
+import { JSONSchema, UISchema, FormClassNames } from '../types/schema';
 import { FieldRenderer } from './FieldRenderer';
+import { ClassNamesProvider, cx } from './ClassNamesContext';
 import '../styles/form.css';
 
 interface SchemaFormProps {
@@ -19,6 +20,7 @@ interface SchemaFormProps {
     surface?: string;
     border?: string;
   };
+  classNames?: FormClassNames;
 }
 
 export const SchemaForm: React.FC<SchemaFormProps> = ({
@@ -28,6 +30,7 @@ export const SchemaForm: React.FC<SchemaFormProps> = ({
   defaultValues,
   columns = 1,
   theme,
+  classNames = {},
 }) => {
   const methods = useForm({
     resolver: ajvResolver(schema as any, {
@@ -57,32 +60,37 @@ export const SchemaForm: React.FC<SchemaFormProps> = ({
     : {};
 
   return (
-    <div className="cdf-form-container" style={themeStyles}>
-      {schema.title && <h2 className="cdf-form-title">{schema.title}</h2>}
-      {schema.description && (
-        <p style={{ color: 'var(--cdf-text-muted)', marginBottom: '1.5rem' }}>
-          {schema.description}
-        </p>
-      )}
+    <ClassNamesProvider value={classNames}>
+      <div className={cx('cdf-form-container', classNames.container)} style={themeStyles}>
+        {schema.title && <h2 className={cx('cdf-form-title', classNames.title)}>{schema.title}</h2>}
+        {schema.description && (
+          <p
+            className={classNames.description}
+            style={{ color: 'var(--cdf-text-muted)', marginBottom: '1.5rem' }}
+          >
+            {schema.description}
+          </p>
+        )}
 
-      <FormProvider {...methods}>
-        <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
-          <div className={`cdf-form-grid-${columns}`}>
-            {Object.entries(schema.properties).map(([key, propSchema]) => (
-              <FieldRenderer
-                key={key}
-                name={key}
-                schema={propSchema}
-                uiSchema={uiSchema[key]}
-                isRequired={schema.required?.includes(key)}
-              />
-            ))}
-          </div>
-          <button type="submit" className="cdf-submit-btn">
-            Submit
-          </button>
-        </form>
-      </FormProvider>
-    </div>
+        <FormProvider {...methods}>
+          <form className={classNames.form} onSubmit={methods.handleSubmit(onSubmit)} noValidate>
+            <div className={`cdf-form-grid-${columns}`}>
+              {Object.entries(schema.properties).map(([key, propSchema]) => (
+                <FieldRenderer
+                  key={key}
+                  name={key}
+                  schema={propSchema}
+                  uiSchema={uiSchema[key]}
+                  isRequired={schema.required?.includes(key)}
+                />
+              ))}
+            </div>
+            <button type="submit" className={cx('cdf-submit-btn', classNames.submitButton)}>
+              Submit
+            </button>
+          </form>
+        </FormProvider>
+      </div>
+    </ClassNamesProvider>
   );
 };

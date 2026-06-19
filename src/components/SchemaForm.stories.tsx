@@ -118,3 +118,47 @@ export const ComplexLayoutForm: Story = {
     onSubmit: (data) => alert(JSON.stringify(data, null, 2)),
   },
 };
+
+export const TailwindForm: Story = {
+  args: {
+    schema: {
+      title: 'Tailwind SaaS Signup',
+      description:
+        'This form uses the classNames API to completely override styles with Tailwind CSS.',
+      type: 'object',
+      properties: {
+        firstName: { type: 'string', title: 'First Name' },
+        lastName: { type: 'string', title: 'Last Name' },
+        email: { type: 'string', format: 'email', title: 'Email Address' },
+        terms: {
+          type: 'boolean',
+          title: 'I accept the terms and conditions',
+          description: 'You must read and agree to our terms before proceeding.',
+        },
+      },
+      required: ['firstName', 'lastName', 'email', 'terms'],
+    },
+    columns: 2,
+    uiSchema: {
+      email: { 'ui:columnSpan': 2 },
+      terms: { 'ui:columnSpan': 2 },
+    },
+    classNames: {
+      container: 'max-w-2xl mx-auto p-8 bg-white rounded-xl shadow-lg border border-gray-100',
+      title: 'text-3xl font-extrabold text-gray-900 tracking-tight mb-2',
+      description: 'text-gray-500 mb-8',
+      form: 'space-y-6',
+      fieldGroup: 'flex flex-col gap-1.5',
+      label: 'text-sm font-semibold text-gray-700',
+      input:
+        'w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 outline-none',
+      inputError: 'border-red-500 focus:ring-red-500 focus:border-red-500 bg-red-50',
+      errorText: 'text-sm text-red-500 font-medium flex items-center gap-1 mt-1',
+      submitButton:
+        'w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5',
+      checkboxLabel: 'flex items-center gap-3 text-gray-700 font-medium cursor-pointer',
+      checkboxInput: 'w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500',
+    },
+    onSubmit: (data) => alert(JSON.stringify(data, null, 2)),
+  },
+};

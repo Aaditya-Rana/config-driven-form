@@ -139,6 +139,51 @@ export default function AdvancedForm() {
 
 ---
 
+## 🎨 Deep Customization with Tailwind CSS (New!)
+
+If you want to use **Tailwind CSS** (or any other class-based framework) to completely reskin the form, `config-driven-form` exposes a deeply nested `classNames` API.
+
+This is a zero-dependency, standard headless UI approach. You can pass global classes via the `classNames` prop on `<SchemaForm>`, and even override specific individual fields using `ui:classNames` in your `uiSchema`!
+
+```tsx
+import React from 'react';
+import { SchemaForm, JSONSchema } from 'config-driven-form';
+// Note: You can skip importing the default CSS if you want pure Tailwind styling
+
+const schema: JSONSchema = {
+  type: 'object',
+  properties: {
+    email: { type: 'string', format: 'email', title: 'Email Address' },
+  },
+};
+
+export default function TailwindForm() {
+  return (
+    <SchemaForm
+      schema={schema}
+      classNames={{
+        container: 'max-w-xl mx-auto p-6 bg-white rounded-xl shadow-md',
+        label: 'block text-sm font-medium text-gray-700 mb-1',
+        input:
+          'w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500',
+        submitButton: 'w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition',
+      }}
+      // You can override specific fields!
+      uiSchema={{
+        email: {
+          'ui:classNames': {
+            input: 'border-red-500 bg-red-50', // e.g. force error state styling statically
+          },
+        },
+      }}
+      onSubmit={(data) => console.log(data)}
+    />
+  );
+}
+```
+
+---
+
 ## 📚 Supported Field Types
 
 The library automatically inspects the `type`, `format`, and `enum` properties of your JSON Schema to render the correct UI component:
@@ -166,9 +211,10 @@ The library automatically inspects the `type`, `format`, and `enum` properties o
 | :-------------- | :------------------------- | :------: | :-------------------------------------------------------------------------------------- |
 | `schema`        | `JSONSchema`               |   Yes    | The standard JSON Schema defining your data.                                            |
 | `onSubmit`      | `(data: any) => void`      |   Yes    | Callback function triggered when the form is valid and submitted.                       |
-| `uiSchema`      | `Record<string, UISchema>` |    No    | Controls UI-specific rendering (widgets, column spans) without altering data structure. |
+| `uiSchema`      | `Record<string, UISchema>` |    No    | Controls UI-specific rendering (widgets, column spans, field-level classNames).         |
 | `columns`       | `1 \| 2 \| 3 \| 4`         |    No    | Defines the global CSS Grid columns for the form layout. Default: `1`.                  |
 | `theme`         | `Object`                   |    No    | An object to override CSS variables (`primary`, `background`, `text`, `error`, etc.).   |
+| `classNames`    | `FormClassNames`           |    No    | An object mapping internal elements to custom CSS classes (e.g., Tailwind CSS support). |
 | `defaultValues` | `Object`                   |    No    | Initial data to populate the form fields before rendering.                              |
 
 ---

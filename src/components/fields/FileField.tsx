@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { JSONSchema } from '../../types/schema';
+import { JSONSchema, UISchema } from '../../types/schema';
+import { useClassNames, cx } from '../ClassNamesContext';
 
 interface FileFieldProps {
   name: string;
   schema: JSONSchema;
+  uiSchema?: UISchema;
   isRequired?: boolean;
 }
 
-export const FileField: React.FC<FileFieldProps> = ({ name, schema, isRequired }) => {
+export const FileField: React.FC<FileFieldProps> = ({ name, schema, uiSchema, isRequired }) => {
+  const globalClasses = useClassNames();
+  const localClasses = uiSchema?.['ui:classNames'] || {};
   const {
     setValue,
     formState: { errors },
@@ -36,15 +40,24 @@ export const FileField: React.FC<FileFieldProps> = ({ name, schema, isRequired }
   };
 
   return (
-    <div className="cdf-field-group">
-      <label className="cdf-label">
+    <div className={cx('cdf-field-group', globalClasses.fieldGroup, localClasses.fieldGroup)}>
+      <label className={cx('cdf-label', globalClasses.label, localClasses.label)}>
         {schema.title || name}
         {isRequired && <span className="cdf-required-mark">*</span>}
       </label>
 
-      <div className={`cdf-file-wrapper ${error ? 'cdf-input--error' : ''}`}>
+      <div
+        className={cx(
+          'cdf-file-wrapper',
+          globalClasses.fileWrapper,
+          localClasses.fileWrapper,
+          error && 'cdf-input--error',
+          error && globalClasses.inputError,
+          error && localClasses.inputError,
+        )}
+      >
         <input type="file" className="cdf-file-input" onChange={handleFileChange} />
-        <div className="cdf-file-text">
+        <div className={cx('cdf-file-text', globalClasses.fileText, localClasses.fileText)}>
           <span>Click to upload</span> or drag and drop
         </div>
         {fileName && (
@@ -55,7 +68,7 @@ export const FileField: React.FC<FileFieldProps> = ({ name, schema, isRequired }
       </div>
 
       {error && (
-        <span className="cdf-error-message">
+        <span className={cx('cdf-error-message', globalClasses.errorText, localClasses.errorText)}>
           <svg
             width="14"
             height="14"

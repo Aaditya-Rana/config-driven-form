@@ -1,14 +1,18 @@
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import { JSONSchema } from '../../types/schema';
+import { JSONSchema, UISchema } from '../../types/schema';
+import { useClassNames, cx } from '../ClassNamesContext';
 
 interface SelectFieldProps {
   name: string;
   schema: JSONSchema;
+  uiSchema?: UISchema;
   isRequired?: boolean;
 }
 
-export const SelectField: React.FC<SelectFieldProps> = ({ name, schema, isRequired }) => {
+export const SelectField: React.FC<SelectFieldProps> = ({ name, schema, uiSchema, isRequired }) => {
+  const globalClasses = useClassNames();
+  const localClasses = uiSchema?.['ui:classNames'] || {};
   const {
     register,
     formState: { errors },
@@ -17,8 +21,8 @@ export const SelectField: React.FC<SelectFieldProps> = ({ name, schema, isRequir
   const error = errors[name];
 
   return (
-    <div className="cdf-field-group">
-      <label htmlFor={name} className="cdf-label">
+    <div className={cx('cdf-field-group', globalClasses.fieldGroup, localClasses.fieldGroup)}>
+      <label htmlFor={name} className={cx('cdf-label', globalClasses.label, localClasses.label)}>
         {schema.title || name}
         {isRequired && <span className="cdf-required-mark">*</span>}
       </label>
@@ -27,7 +31,15 @@ export const SelectField: React.FC<SelectFieldProps> = ({ name, schema, isRequir
         <select
           id={name}
           {...register(name)}
-          className={`cdf-input cdf-select ${error ? 'cdf-input--error' : ''}`}
+          className={cx(
+            'cdf-input',
+            'cdf-select',
+            globalClasses.input,
+            localClasses.input,
+            error && 'cdf-input--error',
+            error && globalClasses.inputError,
+            error && localClasses.inputError,
+          )}
         >
           <option value="">Select an option...</option>
           {schema.enum?.map((option) => (
@@ -39,7 +51,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({ name, schema, isRequir
       </div>
 
       {error && (
-        <span className="cdf-error-message">
+        <span className={cx('cdf-error-message', globalClasses.errorText, localClasses.errorText)}>
           <svg
             width="14"
             height="14"

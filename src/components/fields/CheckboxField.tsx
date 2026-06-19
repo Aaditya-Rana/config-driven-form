@@ -1,14 +1,23 @@
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import { JSONSchema } from '../../types/schema';
+import { JSONSchema, UISchema } from '../../types/schema';
+import { useClassNames, cx } from '../ClassNamesContext';
 
 interface CheckboxFieldProps {
   name: string;
   schema: JSONSchema;
+  uiSchema?: UISchema;
   isRequired?: boolean;
 }
 
-export const CheckboxField: React.FC<CheckboxFieldProps> = ({ name, schema, isRequired }) => {
+export const CheckboxField: React.FC<CheckboxFieldProps> = ({
+  name,
+  schema,
+  uiSchema,
+  isRequired,
+}) => {
+  const globalClasses = useClassNames();
+  const localClasses = uiSchema?.['ui:classNames'] || {};
   const {
     register,
     formState: { errors },
@@ -17,10 +26,30 @@ export const CheckboxField: React.FC<CheckboxFieldProps> = ({ name, schema, isRe
   const error = errors[name];
 
   return (
-    <div className="cdf-field-group">
-      <div className="cdf-checkbox-group">
-        <label className="cdf-checkbox-label">
-          <input type="checkbox" {...register(name)} className="cdf-checkbox-input" />
+    <div className={cx('cdf-field-group', globalClasses.fieldGroup, localClasses.fieldGroup)}>
+      <div
+        className={cx(
+          'cdf-checkbox-group',
+          globalClasses.checkboxGroup,
+          localClasses.checkboxGroup,
+        )}
+      >
+        <label
+          className={cx(
+            'cdf-checkbox-label',
+            globalClasses.checkboxLabel,
+            localClasses.checkboxLabel,
+          )}
+        >
+          <input
+            type="checkbox"
+            {...register(name)}
+            className={cx(
+              'cdf-checkbox-input',
+              globalClasses.checkboxInput,
+              localClasses.checkboxInput,
+            )}
+          />
           {schema.title || name}
           {isRequired && <span className="cdf-required-mark">*</span>}
         </label>
@@ -33,7 +62,7 @@ export const CheckboxField: React.FC<CheckboxFieldProps> = ({ name, schema, isRe
       )}
 
       {error && (
-        <span className="cdf-error-message">
+        <span className={cx('cdf-error-message', globalClasses.errorText, localClasses.errorText)}>
           <svg
             width="14"
             height="14"

@@ -33,15 +33,14 @@ export const Canvas: React.FC<CanvasProps> = ({
         padding: '2rem',
         backgroundColor: '#f3f4f6',
         overflowY: 'auto',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
       }}
       onClick={() => onSelectField('')} // Click outside to deselect
     >
       <div
         ref={setNodeRef}
         style={{
+          margin: '0 auto',
+          height: 'fit-content',
           width: '100%',
           maxWidth: '800px',
           minHeight: '400px',

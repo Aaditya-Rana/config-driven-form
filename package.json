@@ -1,7 +1,7 @@
 {
   "name": "config-driven-form",
   "version": "1.3.0",
-  "description": "",
+  "description": "A highly scalable, production-ready React form library that dynamically generates beautiful, fully validated forms directly from standard JSON Schema, complete with a drag-and-drop Visual Form Builder.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -24,8 +24,17 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "react",
+    "form",
+    "json-schema",
+    "form-builder",
+    "drag-and-drop",
+    "validation",
+    "headless-ui",
+    "tailwindcss"
+  ],
+  "author": "Aaditya Rana",
   "license": "ISC",
   "type": "commonjs",
   "engines": {

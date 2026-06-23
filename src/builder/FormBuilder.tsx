@@ -237,12 +237,12 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
               flex: 1,
               padding: '3rem',
               overflowY: 'auto',
-              display: 'flex',
-              justifyContent: 'center',
             }}
           >
             <div
               style={{
+                margin: '0 auto',
+                height: 'fit-content',
                 width: '100%',
                 maxWidth: '800px',
                 backgroundColor: 'white',

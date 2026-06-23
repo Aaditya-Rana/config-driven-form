@@ -50,6 +50,14 @@ export const RichTextField: React.FC<RichTextFieldProps> = ({
         {schema.title || name}
         {isRequired && <span className="cdf-required-mark">*</span>}
       </label>
+      {schema.description && (
+        <p
+          className={cx('cdf-description', globalClasses.description, localClasses.description)}
+          style={{ fontSize: '0.875rem', color: '#6b7280', margin: '-0.25rem 0 0.5rem 0' }}
+        >
+          {schema.description}
+        </p>
+      )}
 
       <div
         className={cx(

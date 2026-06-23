@@ -229,6 +229,31 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
     });
   };
 
+  const handleErrorMessageChange = (errorKey: string, message: string) => {
+    const currentMessages = (
+      typeof field.schema.errorMessage === 'object' ? field.schema.errorMessage : {}
+    ) as Record<string, string>;
+
+    const newMessages = { ...currentMessages };
+    if (!message) {
+      delete newMessages[errorKey];
+    } else {
+      newMessages[errorKey] = message;
+    }
+
+    handleSchemaChange(
+      'errorMessage',
+      Object.keys(newMessages).length > 0 ? newMessages : undefined,
+    );
+  };
+
+  const getErrorMessage = (errorKey: string) => {
+    if (typeof field.schema.errorMessage === 'object') {
+      return field.schema.errorMessage[errorKey] || '';
+    }
+    return '';
+  };
+
   return (
     <div
       style={{
@@ -420,28 +445,63 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
 
         {activeTab === 'validation' && (
           <>
-            <label
+            <div
               style={{
                 display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                fontSize: '0.875rem',
-                fontWeight: 500,
-                color: '#374151',
-                cursor: 'pointer',
+                flexDirection: 'column',
+                gap: '0.375rem',
+                marginBottom: '1rem',
+                borderBottom: '1px solid #e5e7eb',
+                paddingBottom: '1rem',
               }}
             >
-              <input
-                type="checkbox"
-                checked={field.isRequired || false}
-                onChange={(e) => onUpdate(field.id, { isRequired: e.target.checked })}
-              />
-              Required Field
-            </label>
+              <label
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  color: '#374151',
+                  cursor: 'pointer',
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={field.isRequired || false}
+                  onChange={(e) => onUpdate(field.id, { isRequired: e.target.checked })}
+                />
+                Required Field
+              </label>
+              {field.isRequired && (
+                <input
+                  type="text"
+                  placeholder="Custom required error message"
+                  value={getErrorMessage('required')}
+                  onChange={(e) => handleErrorMessageChange('required', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '0.4rem',
+                    border: '1px dashed #d1d5db',
+                    borderRadius: '0.375rem',
+                    fontSize: '0.75rem',
+                    marginTop: '0.25rem',
+                    backgroundColor: '#f9fafb',
+                  }}
+                />
+              )}
+            </div>
 
             {(field.type === 'text' || field.type === 'email' || field.type === 'password') && (
               <>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.375rem',
+                    marginBottom: '0.5rem',
+                  }}
+                >
                   <label style={{ fontSize: '0.875rem', fontWeight: 500, color: '#374151' }}>
                     Min Length
                   </label>
@@ -462,8 +522,31 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                       fontSize: '0.875rem',
                     }}
                   />
+                  {field.schema.minLength !== undefined && (
+                    <input
+                      type="text"
+                      placeholder="Custom error message"
+                      value={getErrorMessage('minLength')}
+                      onChange={(e) => handleErrorMessageChange('minLength', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '0.4rem',
+                        border: '1px dashed #d1d5db',
+                        borderRadius: '0.375rem',
+                        fontSize: '0.75rem',
+                        backgroundColor: '#f9fafb',
+                      }}
+                    />
+                  )}
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.375rem',
+                    marginBottom: '0.5rem',
+                  }}
+                >
                   <label style={{ fontSize: '0.875rem', fontWeight: 500, color: '#374151' }}>
                     Max Length
                   </label>
@@ -484,8 +567,31 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                       fontSize: '0.875rem',
                     }}
                   />
+                  {field.schema.maxLength !== undefined && (
+                    <input
+                      type="text"
+                      placeholder="Custom error message"
+                      value={getErrorMessage('maxLength')}
+                      onChange={(e) => handleErrorMessageChange('maxLength', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '0.4rem',
+                        border: '1px dashed #d1d5db',
+                        borderRadius: '0.375rem',
+                        fontSize: '0.75rem',
+                        backgroundColor: '#f9fafb',
+                      }}
+                    />
+                  )}
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.375rem',
+                    marginBottom: '0.5rem',
+                  }}
+                >
                   <label style={{ fontSize: '0.875rem', fontWeight: 500, color: '#374151' }}>
                     Regex Pattern
                   </label>
@@ -501,13 +607,36 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                       fontSize: '0.875rem',
                     }}
                   />
+                  {field.schema.pattern !== undefined && (
+                    <input
+                      type="text"
+                      placeholder="Custom error message"
+                      value={getErrorMessage('pattern')}
+                      onChange={(e) => handleErrorMessageChange('pattern', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '0.4rem',
+                        border: '1px dashed #d1d5db',
+                        borderRadius: '0.375rem',
+                        fontSize: '0.75rem',
+                        backgroundColor: '#f9fafb',
+                      }}
+                    />
+                  )}
                 </div>
               </>
             )}
 
             {field.type === 'number' && (
               <>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.375rem',
+                    marginBottom: '0.5rem',
+                  }}
+                >
                   <label style={{ fontSize: '0.875rem', fontWeight: 500, color: '#374151' }}>
                     Minimum Value
                   </label>
@@ -528,8 +657,31 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                       fontSize: '0.875rem',
                     }}
                   />
+                  {field.schema.minimum !== undefined && (
+                    <input
+                      type="text"
+                      placeholder="Custom error message"
+                      value={getErrorMessage('minimum')}
+                      onChange={(e) => handleErrorMessageChange('minimum', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '0.4rem',
+                        border: '1px dashed #d1d5db',
+                        borderRadius: '0.375rem',
+                        fontSize: '0.75rem',
+                        backgroundColor: '#f9fafb',
+                      }}
+                    />
+                  )}
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.375rem',
+                    marginBottom: '0.5rem',
+                  }}
+                >
                   <label style={{ fontSize: '0.875rem', fontWeight: 500, color: '#374151' }}>
                     Maximum Value
                   </label>
@@ -550,6 +702,22 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                       fontSize: '0.875rem',
                     }}
                   />
+                  {field.schema.maximum !== undefined && (
+                    <input
+                      type="text"
+                      placeholder="Custom error message"
+                      value={getErrorMessage('maximum')}
+                      onChange={(e) => handleErrorMessageChange('maximum', e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '0.4rem',
+                        border: '1px dashed #d1d5db',
+                        borderRadius: '0.375rem',
+                        fontSize: '0.75rem',
+                        backgroundColor: '#f9fafb',
+                      }}
+                    />
+                  )}
                 </div>
               </>
             )}

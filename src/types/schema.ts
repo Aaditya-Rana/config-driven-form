@@ -24,6 +24,7 @@ export interface JSONSchema {
   enum?: any[];
   items?: JSONSchema | JSONSchema[];
   default?: any;
+  errorMessage?: string | Record<string, string>;
 }
 
 export interface FormClassNames {

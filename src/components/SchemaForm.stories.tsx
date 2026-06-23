@@ -162,3 +162,53 @@ export const TailwindForm: Story = {
     onSubmit: (data) => alert(JSON.stringify(data, null, 2)),
   },
 };
+
+const validationSchema: JSONSchema = {
+  title: 'Advanced Validation Form',
+  description: 'Demonstrates custom error messages per validation rule using ajv-errors.',
+  type: 'object',
+  properties: {
+    username: {
+      type: 'string',
+      title: 'Username',
+      minLength: 4,
+      maxLength: 15,
+      pattern: '^[a-z0-9_]+$',
+      errorMessage: {
+        minLength: 'Username must be at least 4 characters long.',
+        maxLength: 'Username cannot exceed 15 characters.',
+        pattern: 'Username can only contain lowercase letters, numbers, and underscores.',
+        required: 'Please provide a unique username.',
+      },
+    },
+    age: {
+      type: 'integer',
+      title: 'Age',
+      minimum: 18,
+      maximum: 120,
+      errorMessage: {
+        minimum: 'You must be at least 18 years old to register.',
+        maximum: 'Please enter a valid age under 120.',
+        required: 'Age is required to verify your eligibility.',
+      },
+    },
+    password: {
+      type: 'string',
+      format: 'password',
+      title: 'Password',
+      minLength: 8,
+      errorMessage: {
+        minLength: 'Password must be extremely secure (at least 8 characters).',
+        required: 'A password is absolutely mandatory.',
+      },
+    },
+  },
+  required: ['username', 'age', 'password'],
+};
+
+export const AdvancedValidationForm: Story = {
+  args: {
+    schema: validationSchema,
+    onSubmit: (data) => alert(JSON.stringify(data, null, 2)),
+  },
+};

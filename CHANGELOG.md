@@ -1,5 +1,11 @@
 # config-driven-form
 
+## 1.3.1
+
+### Patch Changes
+
+- 37ad54a: fix: correct form builder overflow rendering, add missing field descriptions, and update package metadata
+
 ## 1.3.0
 
 ### Minor Changes

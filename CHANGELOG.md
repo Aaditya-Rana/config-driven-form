@@ -1,5 +1,11 @@
 # config-driven-form
 
+## 1.4.0
+
+### Minor Changes
+
+- f626f4d: feat: add advanced validations and custom error messages per rule via ajv-errors, including builder UI updates
+
 ## 1.3.1
 
 ### Patch Changes

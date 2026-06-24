@@ -11,7 +11,17 @@ export interface FormSettings {
     background?: string;
     text?: string;
     error?: string;
+    radius?: string;
   };
+  submitButtonText?: string;
+  submitButtonAlign?: 'left' | 'center' | 'right' | 'full';
+  maxWidth?: string;
+  classNames?: {
+    title?: string;
+    description?: string;
+  };
+  title?: string;
+  description?: string;
 }
 
 export const useFormBuilder = (
@@ -106,12 +116,19 @@ export const useFormBuilder = (
     [fields, selectedFieldId],
   );
 
+  const [formSettings, setFormSettings] = useState<FormSettings>({
+    columns: initialColumns || 1,
+    theme: initialTheme || {},
+    title: initialSchema?.title,
+    description: initialSchema?.description,
+  });
+
   // Export back to standard JSON Schema and UI Schema
   const compileSchemas = useCallback(() => {
     const finalSchema: JSONSchema = {
       type: 'object',
-      title: initialSchema?.title || 'Generated Form',
-      description: initialSchema?.description || '',
+      title: formSettings.title ?? initialSchema?.title ?? 'Form Builder',
+      description: formSettings.description ?? initialSchema?.description ?? '',
       properties: {},
       required: [],
     };
@@ -135,12 +152,7 @@ export const useFormBuilder = (
     }
 
     return { schema: finalSchema, uiSchema: finalUiSchema };
-  }, [fields, initialSchema]);
-
-  const [formSettings, setFormSettings] = useState<FormSettings>({
-    columns: initialColumns || 1,
-    theme: initialTheme || {},
-  });
+  }, [fields, initialSchema, formSettings.title, formSettings.description]);
 
   const updateFormSettings = useCallback((updates: Partial<FormSettings>) => {
     setFormSettings((prev) => ({

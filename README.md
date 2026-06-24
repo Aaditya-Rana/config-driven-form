@@ -191,6 +191,13 @@ Tired of writing JSON by hand? We've built a world-class, **Drag-and-Drop Visual
 
 You can embed this builder into your own admin panels, let users visually construct their forms, set validation rules, pick themes, and then save the output as standard `JSONSchema` to store in your database!
 
+### 🌟 Builder Features (New in v1.4.1!)
+
+- **📱 Mobile-First Responsive Design**: Create and edit forms perfectly from your smartphone with touch-optimized scrollable toolboxes, collapsible action bars, and smart viewport scaling.
+- **👆 Touch Drag & Drop**: Flawless touch screen dragging with intelligent distance constraints to prevent accidental taps from canceling your drag.
+- **🎨 Live Typography & Sizing Engine**: Instantly preview field Width, Height, Text Size, and Alignments directly inside the builder. No external TailwindCSS configuration required—everything runs out of the box!
+- **📐 Visual Grid Layouts**: Easily build complex 1-to-4 column responsive forms. Click and drag a field's edges to visually snap its width across multiple grid columns in real-time.
+
 ```tsx
 import React from 'react';
 import { FormBuilder } from 'config-driven-form';

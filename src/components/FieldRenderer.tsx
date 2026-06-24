@@ -93,7 +93,5 @@ export const FieldRenderer: React.FC<FieldRendererProps> = ({
     );
   };
 
-  return (
-    <div style={{ gridColumn: `span ${columnSpan} / span ${columnSpan}` }}>{renderField()}</div>
-  );
+  return <div className={`cdf-builder-field-span-${columnSpan}`}>{renderField()}</div>;
 };

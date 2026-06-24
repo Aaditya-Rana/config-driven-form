@@ -27,11 +27,12 @@ const TOOLS: { type: BuilderFieldType; label: string; icon: React.ReactNode }[] 
   { type: 'file', label: 'File Upload', icon: <FileUp size={18} /> },
 ];
 
-const DraggableTool: React.FC<{ type: BuilderFieldType; label: string; icon: React.ReactNode }> = ({
-  type,
-  label,
-  icon,
-}) => {
+const DraggableTool: React.FC<{
+  type: BuilderFieldType;
+  label: string;
+  icon: React.ReactNode;
+  onAddField: (type: BuilderFieldType) => void;
+}> = ({ type, label, icon, onAddField }) => {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `toolbox-${type}`,
     data: {
@@ -45,6 +46,7 @@ const DraggableTool: React.FC<{ type: BuilderFieldType; label: string; icon: Rea
       ref={setNodeRef}
       {...listeners}
       {...attributes}
+      onClick={() => onAddField(type)}
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -67,36 +69,34 @@ const DraggableTool: React.FC<{ type: BuilderFieldType; label: string; icon: Rea
         (e.currentTarget as HTMLDivElement).style.borderColor = '#e5e7eb';
         (e.currentTarget as HTMLDivElement).style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';
       }}
+      className="cdf-toolbox-item"
     >
-      <div style={{ color: '#6b7280' }}>{icon}</div>
+      <div style={{ color: '#6366f1' }}>{icon}</div>
       <span style={{ fontSize: '0.875rem', fontWeight: 500, color: '#374151' }}>{label}</span>
     </div>
   );
 };
 
-export const Toolbox: React.FC = () => {
+export const Toolbox: React.FC<{ onAddField: (type: BuilderFieldType) => void }> = ({
+  onAddField,
+}) => {
   return (
-    <div
-      style={{
-        padding: '1.5rem',
-        width: '280px',
-        borderRight: '1px solid #e5e7eb',
-        backgroundColor: '#f9fafb',
-        height: '100%',
-        overflowY: 'auto',
-      }}
-    >
-      <h3 style={{ fontSize: '1rem', fontWeight: 600, color: '#111827', marginBottom: '1rem' }}>
-        Form Elements
-      </h3>
-      <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '1.5rem' }}>
-        Drag and drop fields onto the canvas to build your form.
-      </p>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-        {TOOLS.map((tool) => (
-          <DraggableTool key={tool.type} {...tool} />
-        ))}
+    <div className="cdf-toolbox">
+      <div className="cdf-toolbox-inner">
+        <div>
+          <h3 className="cdf-toolbox-group-title">Form Elements</h3>
+          <div className="cdf-toolbox-items">
+            {TOOLS.map((tool) => (
+              <DraggableTool
+                key={tool.type}
+                type={tool.type as BuilderFieldType}
+                label={tool.label}
+                icon={tool.icon}
+                onAddField={onAddField}
+              />
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

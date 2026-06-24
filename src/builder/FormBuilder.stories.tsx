@@ -14,6 +14,17 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/**
+ * **Empty Builder (v1.4.1+)**
+ *
+ * Features to test:
+ * - **Mobile UI**: Shrink your viewport to see the horizontal scrolling toolbox and collapsible topbar.
+ * - **Touch Dragging**: Try dragging elements on a touch device simulator.
+ * - **Grid Engine**: Open Global Settings (top right gear), set columns to 4.
+ *   Then select a field, drag its right edge, or click the column toggle button to span multiple columns!
+ * - **Typography/Sizes**: Select a field, open settings, go to Design tab, and change Width or Font Size to see it instantly update.
+ */
+
 export const EmptyBuilder: Story = {
   args: {
     onSave: (schema: JSONSchema, uiSchema: Record<string, UISchema>) => {

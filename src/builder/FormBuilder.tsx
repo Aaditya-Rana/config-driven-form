@@ -5,6 +5,7 @@ import {
   closestCenter,
   KeyboardSensor,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   DragEndEvent,
@@ -17,8 +18,10 @@ import { Toolbox } from './components/Toolbox';
 import { Canvas } from './components/Canvas';
 import { PropertiesPanel } from './components/PropertiesPanel';
 import { BuilderFieldType } from './types';
-import { Save, Code2, Eye, LayoutTemplate } from 'lucide-react';
+import { Save, Code2, Eye, LayoutTemplate, Settings } from 'lucide-react';
+import { FormProvider, useForm } from 'react-hook-form';
 import { SchemaForm } from '../components/SchemaForm';
+import { FieldRenderer } from '../components/FieldRenderer';
 import '../styles/form.css'; // Ensure base form styles are loaded for canvas
 
 export interface FormBuilderProps {
@@ -55,10 +58,25 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
   } = useFormBuilder(initialSchema, initialUiSchema, initialColumns, initialTheme);
 
   const [activeDragType, setActiveDragType] = useState<BuilderFieldType | null>(null);
+  const [activeSortableField, setActiveSortableField] = useState<any | null>(null);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [isPropertiesDialogOpen, setIsPropertiesDialogOpen] = useState(false);
+
+  // Dummy form methods for the drag overlay
+  const methods = useForm();
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
@@ -68,12 +86,15 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
     const { active } = event;
     if (active.data.current?.type === 'ToolboxItem') {
       setActiveDragType(active.data.current.fieldType);
+    } else if (active.data.current?.type === 'SortableField') {
+      setActiveSortableField(active.data.current.field);
     }
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveDragType(null);
+    setActiveSortableField(null);
 
     if (!over) return;
 
@@ -114,18 +135,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
       }}
     >
       {/* Top Bar */}
-      <div
-        style={{
-          height: '60px',
-          borderBottom: '1px solid #e5e7eb',
-          backgroundColor: 'white',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '0 1.5rem',
-          zIndex: 20,
-        }}
-      >
+      <div className="cdf-builder-topbar">
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <div
             style={{
@@ -197,8 +207,33 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
           </button>
         </div>
 
-        <div>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
           <button
+            className="cdf-topbar-action"
+            onClick={() => {
+              setSelectedFieldId(null);
+              setIsPropertiesDialogOpen(true);
+            }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              backgroundColor: 'white',
+              color: '#374151',
+              border: '1px solid #d1d5db',
+              padding: '0.5rem 1rem',
+              borderRadius: '0.375rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'background-color 0.2s',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f9fafb')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'white')}
+          >
+            <Settings size={16} /> <span>Global Settings</span>
+          </button>
+          <button
+            className="cdf-topbar-action"
             onClick={handleSave}
             style={{
               display: 'flex',
@@ -216,21 +251,13 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
             onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#4f46e5')}
             onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#6366f1')}
           >
-            <Save size={16} /> Save Form
+            <Save size={16} /> <span>Save Form</span>
           </button>
         </div>
       </div>
 
       {/* Main Area */}
-      <div
-        style={{
-          display: 'flex',
-          flex: 1,
-          overflow: 'hidden',
-          backgroundColor: '#f3f4f6',
-          minHeight: 0,
-        }}
-      >
+      <div className="cdf-builder-main">
         {isPreviewMode ? (
           <div
             style={{
@@ -244,7 +271,8 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                 margin: '0 auto',
                 height: 'fit-content',
                 width: '100%',
-                maxWidth: '800px',
+                maxWidth: formSettings.maxWidth || '800px',
+                minHeight: '400px',
                 backgroundColor: 'white',
                 padding: '2rem',
                 borderRadius: '1rem',
@@ -278,6 +306,9 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                 uiSchema={compileSchemas().uiSchema}
                 columns={formSettings.columns}
                 theme={formSettings.theme}
+                classNames={formSettings.classNames}
+                submitButtonText={formSettings.submitButtonText}
+                submitButtonAlign={formSettings.submitButtonAlign}
                 onSubmit={(data) =>
                   alert('Preview Form Submitted!\n\n' + JSON.stringify(data, null, 2))
                 }
@@ -292,11 +323,15 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
             onDragEnd={handleDragEnd}
           >
             {/* Left: Toolbox */}
-            <Toolbox />
+            <Toolbox onAddField={(type) => addField(type, undefined)} />
 
             {/* Center: Canvas */}
             <Canvas
               fields={fields}
+              schema={compileSchemas().schema}
+              formSettings={formSettings}
+              globalColumns={formSettings.columns}
+              theme={formSettings.theme}
               selectedFieldId={selectedFieldId}
               onSelectField={setSelectedFieldId}
               onRemoveField={removeField}
@@ -305,18 +340,32 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                 const idx = fields.findIndex((field) => field.id === f.id);
                 addField(f.type, idx + 1);
               }}
+              onEditField={(id) => {
+                setSelectedFieldId(id);
+                setIsPropertiesDialogOpen(true);
+              }}
+              onUpdateColumnSpan={(id, span) => {
+                const f = fields.find((field) => field.id === id);
+                if (f) {
+                  updateField(id, {
+                    uiSchema: { ...(f.uiSchema || {}), 'ui:columnSpan': span },
+                  });
+                }
+              }}
             />
 
-            {/* Right: Properties */}
+            {/* Modal Dialog Properties */}
             <PropertiesPanel
               field={selectedField || null}
               formSettings={formSettings}
+              isOpen={isPropertiesDialogOpen}
+              onClose={() => setIsPropertiesDialogOpen(false)}
               onUpdate={updateField}
               onUpdateSettings={updateFormSettings}
             />
 
             {/* Drag Overlay (Visual feedback when dragging) */}
-            <DragOverlay>
+            <DragOverlay dropAnimation={null}>
               {activeDragType ? (
                 <div
                   style={{
@@ -329,6 +378,31 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
                   }}
                 >
                   Dropping {activeDragType}...
+                </div>
+              ) : activeSortableField ? (
+                <div
+                  style={{
+                    padding: '1.5rem 1rem 1rem',
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    borderRadius: '0.75rem',
+                    border: '2px solid #6366f1',
+                    boxShadow:
+                      '0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1)',
+                    transform: 'scale(1.02)',
+                    opacity: 0.9,
+                    cursor: 'grabbing',
+                  }}
+                >
+                  <FormProvider {...methods}>
+                    <form>
+                      <FieldRenderer
+                        name={activeSortableField.key}
+                        schema={activeSortableField.schema}
+                        uiSchema={activeSortableField.uiSchema}
+                        isRequired={activeSortableField.isRequired}
+                      />
+                    </form>
+                  </FormProvider>
                 </div>
               ) : null}
             </DragOverlay>

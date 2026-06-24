@@ -19,8 +19,11 @@ interface SchemaFormProps {
     error?: string;
     surface?: string;
     border?: string;
+    radius?: string;
   };
   classNames?: FormClassNames;
+  submitButtonText?: string;
+  submitButtonAlign?: 'left' | 'center' | 'right' | 'full';
 }
 
 export const SchemaForm: React.FC<SchemaFormProps> = ({
@@ -31,6 +34,8 @@ export const SchemaForm: React.FC<SchemaFormProps> = ({
   columns = 1,
   theme,
   classNames = {},
+  submitButtonText = 'Submit',
+  submitButtonAlign = 'full',
 }) => {
   const methods = useForm({
     resolver: ajvResolver(schema as any, {
@@ -56,6 +61,7 @@ export const SchemaForm: React.FC<SchemaFormProps> = ({
         '--cdf-error': theme.error,
         '--cdf-surface': theme.surface,
         '--cdf-border': theme.border,
+        '--cdf-radius': theme.radius,
       } as React.CSSProperties)
     : {};
 
@@ -85,9 +91,30 @@ export const SchemaForm: React.FC<SchemaFormProps> = ({
                 />
               ))}
             </div>
-            <button type="submit" className={cx('cdf-submit-btn', classNames.submitButton)}>
-              Submit
-            </button>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent:
+                  submitButtonAlign === 'left'
+                    ? 'flex-start'
+                    : submitButtonAlign === 'right'
+                      ? 'flex-end'
+                      : submitButtonAlign === 'center'
+                        ? 'center'
+                        : 'stretch',
+                width: '100%',
+              }}
+            >
+              <button
+                type="submit"
+                className={cx('cdf-submit-btn', classNames.submitButton)}
+                style={
+                  submitButtonAlign !== 'full' ? { width: 'auto', minWidth: '150px' } : undefined
+                }
+              >
+                {submitButtonText}
+              </button>
+            </div>
           </form>
         </FormProvider>
       </div>

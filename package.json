@@ -1,6 +1,6 @@
 {
   "name": "config-driven-form",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "A highly scalable, production-ready React form library that dynamically generates beautiful, fully validated forms directly from standard JSON Schema, complete with a drag-and-drop Visual Form Builder.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

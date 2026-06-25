@@ -12,6 +12,22 @@ export interface FormSettings {
     text?: string;
     error?: string;
     radius?: string;
+    light?: {
+      primary?: string;
+      background?: string;
+      text?: string;
+      error?: string;
+      surface?: string;
+      border?: string;
+    };
+    dark?: {
+      primary?: string;
+      background?: string;
+      text?: string;
+      error?: string;
+      surface?: string;
+      border?: string;
+    };
   };
   submitButtonText?: string;
   submitButtonAlign?: 'left' | 'center' | 'right' | 'full';
@@ -22,6 +38,7 @@ export interface FormSettings {
   };
   title?: string;
   description?: string;
+  themeMode?: 'light' | 'dark' | 'system';
 }
 
 export const useFormBuilder = (
@@ -42,6 +59,9 @@ export const useFormBuilder = (
         else if (propSchema.format === 'password') type = 'password';
         else if (propSchema.format === 'data-url') type = 'file';
         else if (propSchema.format === 'rich-text') type = 'rich-text';
+        else if (propSchema.format === 'date') type = 'date';
+        else if (propSchema.format === 'date-time') type = 'datetime';
+        else if (propSchema.format === 'time') type = 'time';
         else if (propSchema.enum) type = 'select'; // or radio, we'll refine below
       } else if (propSchema.type === 'number' || propSchema.type === 'integer') {
         type = 'number';
@@ -54,6 +74,8 @@ export const useFormBuilder = (
       const uiSchema = initialUiSchema?.[key];
       if (propSchema.enum && uiSchema?.['ui:widget'] === 'radio') {
         type = 'radio';
+      } else if (uiSchema?.['ui:widget'] === 'textarea') {
+        type = 'textarea';
       }
 
       return {
@@ -69,15 +91,24 @@ export const useFormBuilder = (
 
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
 
-  const addField = useCallback((type: BuilderFieldType, index?: number) => {
+  const addField = useCallback((type: BuilderFieldType, index?: number, step?: number) => {
     const template = FIELD_TEMPLATES[type];
+
+    let initialUiSchema = template.uiSchema ? JSON.parse(JSON.stringify(template.uiSchema)) : {};
+    if (step !== undefined) {
+      initialUiSchema['ui:step'] = step;
+    }
+    if (Object.keys(initialUiSchema).length === 0) {
+      initialUiSchema = undefined;
+    }
+
     const newField: FieldDef = {
       id: uuidv4(),
       key: `field_${Date.now()}`,
       type,
       // Deep clone template schemas
       schema: JSON.parse(JSON.stringify(template.schema)),
-      uiSchema: template.uiSchema ? JSON.parse(JSON.stringify(template.uiSchema)) : undefined,
+      uiSchema: initialUiSchema,
     };
 
     setFields((prev) => {
@@ -119,6 +150,7 @@ export const useFormBuilder = (
   const [formSettings, setFormSettings] = useState<FormSettings>({
     columns: initialColumns || 1,
     theme: initialTheme || {},
+    themeMode: 'system',
     title: initialSchema?.title,
     description: initialSchema?.description,
   });

@@ -60,7 +60,16 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
   const [activeDragType, setActiveDragType] = useState<BuilderFieldType | null>(null);
   const [activeSortableField, setActiveSortableField] = useState<any | null>(null);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [previewDevice, setPreviewDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const [isPropertiesDialogOpen, setIsPropertiesDialogOpen] = useState(false);
+  const [activeStep, setActiveStep] = useState(0);
+
+  const maxStep = React.useMemo(() => {
+    return fields.reduce((max, field) => {
+      const step = field.uiSchema?.['ui:step'] || 0;
+      return Math.max(max, step);
+    }, 0);
+  }, [fields]);
 
   // Dummy form methods for the drag overlay
   const methods = useForm();
@@ -106,6 +115,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
         addField(
           active.data.current.fieldType as BuilderFieldType,
           overIndex >= 0 ? overIndex : undefined,
+          activeStep,
         );
       }
       return;
@@ -207,6 +217,78 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
           </button>
         </div>
 
+        {isPreviewMode && (
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <div
+              style={{
+                display: 'flex',
+                gap: '0.25rem',
+                backgroundColor: '#f3f4f6',
+                padding: '0.25rem',
+                borderRadius: '0.5rem',
+              }}
+            >
+              {(['desktop', 'tablet', 'mobile'] as const).map((device) => (
+                <button
+                  key={device}
+                  onClick={() => setPreviewDevice(device)}
+                  style={{
+                    padding: '0.25rem 0.75rem',
+                    fontSize: '0.75rem',
+                    fontWeight: 500,
+                    border: 'none',
+                    borderRadius: '0.25rem',
+                    cursor: 'pointer',
+                    textTransform: 'capitalize',
+                    transition: 'all 0.2s',
+                    backgroundColor: previewDevice === device ? 'white' : 'transparent',
+                    color: previewDevice === device ? '#111827' : '#6b7280',
+                    boxShadow: previewDevice === device ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
+                  }}
+                >
+                  {device}
+                </button>
+              ))}
+            </div>
+
+            <div
+              style={{
+                display: 'flex',
+                gap: '0.25rem',
+                backgroundColor: '#f3f4f6',
+                padding: '0.25rem',
+                borderRadius: '0.5rem',
+              }}
+            >
+              {(['light', 'dark', 'system'] as const).map((mode) => (
+                <button
+                  key={mode}
+                  onClick={() => updateFormSettings({ themeMode: mode })}
+                  style={{
+                    padding: '0.25rem 0.75rem',
+                    fontSize: '0.75rem',
+                    fontWeight: 500,
+                    border: 'none',
+                    borderRadius: '0.25rem',
+                    cursor: 'pointer',
+                    textTransform: 'capitalize',
+                    transition: 'all 0.2s',
+                    backgroundColor:
+                      (formSettings.themeMode || 'system') === mode ? 'white' : 'transparent',
+                    color: (formSettings.themeMode || 'system') === mode ? '#111827' : '#6b7280',
+                    boxShadow:
+                      (formSettings.themeMode || 'system') === mode
+                        ? '0 1px 2px rgba(0,0,0,0.05)'
+                        : 'none',
+                  }}
+                >
+                  {mode}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div style={{ display: 'flex', gap: '0.5rem' }}>
           <button
             className="cdf-topbar-action"
@@ -268,44 +350,34 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
           >
             <div
               style={{
-                margin: '0 auto',
-                height: 'fit-content',
                 width: '100%',
-                maxWidth: formSettings.maxWidth || '800px',
-                minHeight: '400px',
-                backgroundColor: 'white',
-                padding: '2rem',
-                borderRadius: '1rem',
-                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                maxWidth:
+                  previewDevice === 'mobile'
+                    ? '375px'
+                    : previewDevice === 'tablet'
+                      ? '768px'
+                      : formSettings.maxWidth || '800px',
+                transition: 'all 0.3s ease',
+                margin: '0 auto',
+                border: previewDevice !== 'desktop' ? '12px solid #1f2937' : 'none',
+                borderTopWidth: previewDevice !== 'desktop' ? '40px' : 'none',
+                borderBottomWidth: previewDevice !== 'desktop' ? '40px' : 'none',
+                borderRadius: previewDevice !== 'desktop' ? '2.5rem' : '0',
+                backgroundColor:
+                  previewDevice !== 'desktop'
+                    ? formSettings.themeMode === 'dark'
+                      ? '#1e293b'
+                      : 'white'
+                    : 'transparent',
+                overflow: 'hidden',
               }}
             >
-              <div
-                style={{
-                  marginBottom: '2rem',
-                  paddingBottom: '1rem',
-                  borderBottom: '1px solid #e5e7eb',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: '0.875rem',
-                    fontWeight: 600,
-                    color: '#6366f1',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                  }}
-                >
-                  Live Preview
-                </span>
-              </div>
               <SchemaForm
                 schema={compileSchemas().schema}
                 uiSchema={compileSchemas().uiSchema}
                 columns={formSettings.columns}
                 theme={formSettings.theme}
+                themeMode={formSettings.themeMode}
                 classNames={formSettings.classNames}
                 submitButtonText={formSettings.submitButtonText}
                 submitButtonAlign={formSettings.submitButtonAlign}
@@ -323,46 +395,106 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
             onDragEnd={handleDragEnd}
           >
             {/* Left: Toolbox */}
-            <Toolbox onAddField={(type) => addField(type, undefined)} />
+            <Toolbox onAddField={(type) => addField(type, undefined, activeStep)} />
 
-            {/* Center: Canvas */}
-            <Canvas
-              fields={fields}
-              schema={compileSchemas().schema}
-              formSettings={formSettings}
-              globalColumns={formSettings.columns}
-              theme={formSettings.theme}
-              selectedFieldId={selectedFieldId}
-              onSelectField={setSelectedFieldId}
-              onRemoveField={removeField}
-              onDuplicateField={(f) => {
-                // Add a copy of the field right after it
-                const idx = fields.findIndex((field) => field.id === f.id);
-                addField(f.type, idx + 1);
+            {/* Center: Canvas and Tabs */}
+            <div
+              style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                backgroundColor: '#f3f4f6',
+                padding: '2rem',
               }}
-              onEditField={(id) => {
-                setSelectedFieldId(id);
-                setIsPropertiesDialogOpen(true);
-              }}
-              onUpdateColumnSpan={(id, span) => {
-                const f = fields.find((field) => field.id === id);
-                if (f) {
-                  updateField(id, {
-                    uiSchema: { ...(f.uiSchema || {}), 'ui:columnSpan': span },
-                  });
-                }
-              }}
-            />
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  gap: '0.5rem',
+                  marginBottom: '1rem',
+                  overflowX: 'auto',
+                  paddingBottom: '0.5rem',
+                }}
+              >
+                {Array.from({ length: maxStep + 1 }).map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveStep(i)}
+                    style={{
+                      padding: '0.5rem 1.5rem',
+                      borderRadius: '9999px',
+                      border: '1px solid',
+                      borderColor: activeStep === i ? '#6366f1' : '#d1d5db',
+                      backgroundColor: activeStep === i ? '#eef2ff' : 'white',
+                      color: activeStep === i ? '#4f46e5' : '#4b5563',
+                      fontWeight: 500,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    Step {i + 1}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setActiveStep(maxStep + 1)}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    borderRadius: '9999px',
+                    border: '1px dashed #9ca3af',
+                    backgroundColor: 'transparent',
+                    color: '#6b7280',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.25rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  + Add Step
+                </button>
+              </div>
 
-            {/* Modal Dialog Properties */}
-            <PropertiesPanel
-              field={selectedField || null}
-              formSettings={formSettings}
-              isOpen={isPropertiesDialogOpen}
-              onClose={() => setIsPropertiesDialogOpen(false)}
-              onUpdate={updateField}
-              onUpdateSettings={updateFormSettings}
-            />
+              <div
+                style={{
+                  flex: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  backgroundColor: 'white',
+                  borderRadius: '1rem',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                  overflow: 'hidden',
+                }}
+              >
+                <Canvas
+                  fields={fields.filter((f) => (f.uiSchema?.['ui:step'] || 0) === activeStep)}
+                  schema={compileSchemas().schema}
+                  formSettings={formSettings}
+                  globalColumns={formSettings.columns}
+                  theme={formSettings.theme}
+                  selectedFieldId={selectedFieldId}
+                  onSelectField={setSelectedFieldId}
+                  onRemoveField={removeField}
+                  onDuplicateField={(f) => {
+                    const idx = fields.findIndex((field) => field.id === f.id);
+                    addField(f.type, idx + 1, activeStep);
+                  }}
+                  onEditField={(id) => {
+                    setSelectedFieldId(id);
+                    setIsPropertiesDialogOpen(true);
+                  }}
+                  onUpdateColumnSpan={(id, span) => {
+                    const f = fields.find((field) => field.id === id);
+                    if (f) {
+                      updateField(id, {
+                        uiSchema: { ...(f.uiSchema || {}), 'ui:columnSpan': span },
+                      });
+                    }
+                  }}
+                />
+              </div>
+            </div>
 
             {/* Drag Overlay (Visual feedback when dragging) */}
             <DragOverlay dropAnimation={null}>
@@ -408,6 +540,16 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
             </DragOverlay>
           </DndContext>
         )}
+
+        {/* Modal Dialog Properties */}
+        <PropertiesPanel
+          field={selectedField || null}
+          formSettings={formSettings}
+          isOpen={isPropertiesDialogOpen}
+          onClose={() => setIsPropertiesDialogOpen(false)}
+          onUpdate={updateField}
+          onUpdateSettings={updateFormSettings}
+        />
       </div>
     </div>
   );

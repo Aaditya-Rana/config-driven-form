@@ -12,6 +12,10 @@ import {
   List,
   ChevronDown,
   CheckCircle2,
+  AlignJustify,
+  Calendar,
+  CalendarClock,
+  Clock,
 } from 'lucide-react';
 
 const TOOLS: { type: BuilderFieldType; label: string; icon: React.ReactNode }[] = [
@@ -25,6 +29,10 @@ const TOOLS: { type: BuilderFieldType; label: string; icon: React.ReactNode }[] 
   { type: 'checkbox', label: 'Checkbox', icon: <CheckSquare size={18} /> },
   { type: 'checkboxes', label: 'Checkbox Group', icon: <List size={18} /> },
   { type: 'file', label: 'File Upload', icon: <FileUp size={18} /> },
+  { type: 'textarea', label: 'Long Text', icon: <AlignJustify size={18} /> },
+  { type: 'date', label: 'Date', icon: <Calendar size={18} /> },
+  { type: 'datetime', label: 'Date & Time', icon: <CalendarClock size={18} /> },
+  { type: 'time', label: 'Time', icon: <Clock size={18} /> },
 ];
 
 const DraggableTool: React.FC<{

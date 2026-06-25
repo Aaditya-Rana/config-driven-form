@@ -17,6 +17,23 @@
   --cdf-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.cdf-form-container[data-theme='dark'],
+[data-theme='dark'] .cdf-form-container:not([data-theme='light']) {
+  --cdf-primary: #818cf8;
+  --cdf-primary-hover: #6366f1;
+  --cdf-primary-light: rgba(129, 140, 248, 0.15);
+  --cdf-error: #f87171;
+  --cdf-error-light: rgba(248, 113, 113, 0.15);
+  --cdf-bg: #1e293b;
+  --cdf-surface: #0f172a;
+  --cdf-border: #334155;
+  --cdf-border-focus: #475569;
+  --cdf-text: #f8fafc;
+  --cdf-text-muted: #94a3b8;
+  --cdf-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --cdf-shadow-focus: 0 0 0 4px rgba(129, 140, 248, 0.2);
+}
+
 .cdf-form-container {
   font-family: var(--cdf-font);
   color: var(--cdf-text);

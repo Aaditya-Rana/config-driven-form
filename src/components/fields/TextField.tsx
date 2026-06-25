@@ -35,20 +35,49 @@ export const TextField: React.FC<TextFieldProps> = ({ name, schema, uiSchema, is
         </p>
       )}
       <div className="cdf-input-wrapper">
-        <input
-          id={name}
-          type={schema.format === 'email' ? 'email' : 'text'}
-          className={cx(
-            'cdf-input',
-            globalClasses.input,
-            localClasses.input,
-            error && 'cdf-input--error',
-            error && globalClasses.inputError,
-            error && localClasses.inputError,
-          )}
-          placeholder={`Enter ${schema.title || name}`}
-          {...register(name)}
-        />
+        {uiSchema?.['ui:widget'] === 'textarea' ? (
+          <textarea
+            id={name}
+            className={cx(
+              'cdf-input',
+              globalClasses.input,
+              localClasses.input,
+              error && 'cdf-input--error',
+              error && globalClasses.inputError,
+              error && localClasses.inputError,
+            )}
+            placeholder={`Enter ${schema.title || name}`}
+            style={{ minHeight: '100px', resize: 'vertical' }}
+            {...register(name)}
+          />
+        ) : (
+          <input
+            id={name}
+            type={
+              schema.format === 'email'
+                ? 'email'
+                : schema.format === 'date'
+                  ? 'date'
+                  : schema.format === 'date-time'
+                    ? 'datetime-local'
+                    : schema.format === 'time'
+                      ? 'time'
+                      : schema.format === 'password'
+                        ? 'password'
+                        : 'text'
+            }
+            className={cx(
+              'cdf-input',
+              globalClasses.input,
+              localClasses.input,
+              error && 'cdf-input--error',
+              error && globalClasses.inputError,
+              error && localClasses.inputError,
+            )}
+            placeholder={`Enter ${schema.title || name}`}
+            {...register(name)}
+          />
+        )}
       </div>
       {error && (
         <span className={cx('cdf-error-message', globalClasses.errorText, localClasses.errorText)}>

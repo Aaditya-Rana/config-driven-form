@@ -48,9 +48,16 @@ export interface FormClassNames {
   fileText?: string;
 }
 
+export interface UICondition {
+  targetField: string;
+  operator: 'is' | 'isNot' | 'contains' | 'doesNotContain' | 'isEmpty' | 'isNotEmpty' | 'gt' | 'lt';
+  expectedValue?: any;
+}
+
 export interface UISchema {
   'ui:widget'?: 'radio' | 'checkboxes' | 'textarea' | 'color' | string;
   'ui:columnSpan'?: number;
   'ui:classNames'?: FormClassNames;
+  'ui:condition'?: UICondition;
   [key: string]: any;
 }

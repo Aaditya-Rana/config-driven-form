@@ -10,7 +10,11 @@ export type BuilderFieldType =
   | 'checkbox'
   | 'checkboxes'
   | 'select'
-  | 'radio';
+  | 'radio'
+  | 'textarea'
+  | 'date'
+  | 'datetime'
+  | 'time';
 
 export interface FieldDef {
   id: string; // Internal UUID for drag and drop
@@ -61,11 +65,28 @@ export const FIELD_TEMPLATES: Record<BuilderFieldType, Omit<FieldDef, 'id' | 'ke
   },
   select: {
     type: 'select',
-    schema: { type: 'string', title: 'Dropdown', enum: ['Option 1', 'Option 2'] },
+    schema: { type: 'string', title: 'Dropdown Select', enum: ['Option 1', 'Option 2'] },
   },
   radio: {
     type: 'radio',
     schema: { type: 'string', title: 'Radio Buttons', enum: ['Option 1', 'Option 2'] },
     uiSchema: { 'ui:widget': 'radio' },
+  },
+  textarea: {
+    type: 'textarea',
+    schema: { type: 'string', title: 'Long Text' },
+    uiSchema: { 'ui:widget': 'textarea' },
+  },
+  date: {
+    type: 'date',
+    schema: { type: 'string', format: 'date', title: 'Date' },
+  },
+  datetime: {
+    type: 'datetime',
+    schema: { type: 'string', format: 'date-time', title: 'Date & Time' },
+  },
+  time: {
+    type: 'time',
+    schema: { type: 'string', format: 'time', title: 'Time' },
   },
 };

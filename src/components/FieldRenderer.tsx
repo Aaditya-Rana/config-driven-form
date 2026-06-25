@@ -1,4 +1,5 @@
 import React from 'react';
+import { useWatch } from 'react-hook-form';
 import { JSONSchema, UISchema } from '../types/schema';
 import { TextField } from './fields/TextField';
 import { PasswordField } from './fields/PasswordField';
@@ -15,6 +16,7 @@ interface FieldRendererProps {
   schema: JSONSchema;
   uiSchema?: UISchema;
   isRequired?: boolean;
+  isBuilder?: boolean;
 }
 
 export const FieldRenderer: React.FC<FieldRendererProps> = ({
@@ -22,9 +24,52 @@ export const FieldRenderer: React.FC<FieldRendererProps> = ({
   schema,
   uiSchema,
   isRequired,
+  isBuilder,
 }) => {
   const columnSpan = uiSchema?.['ui:columnSpan'] || 1;
   const widget = uiSchema?.['ui:widget'];
+  const condition = uiSchema?.['ui:condition'];
+
+  const targetValue = useWatch({
+    name: condition?.targetField || '',
+    disabled: !condition,
+  });
+
+  if (condition) {
+    const { operator, expectedValue } = condition;
+    let isMatch = false;
+
+    switch (operator) {
+      case 'is':
+        isMatch = targetValue === expectedValue;
+        break;
+      case 'isNot':
+        isMatch = targetValue !== expectedValue;
+        break;
+      case 'contains':
+        isMatch = typeof targetValue === 'string' && targetValue.includes(String(expectedValue));
+        break;
+      case 'doesNotContain':
+        isMatch = typeof targetValue === 'string' && !targetValue.includes(String(expectedValue));
+        break;
+      case 'isEmpty':
+        isMatch = targetValue === '' || targetValue === null || targetValue === undefined;
+        break;
+      case 'isNotEmpty':
+        isMatch = targetValue !== '' && targetValue !== null && targetValue !== undefined;
+        break;
+      case 'gt':
+        isMatch = Number(targetValue) > Number(expectedValue);
+        break;
+      case 'lt':
+        isMatch = Number(targetValue) < Number(expectedValue);
+        break;
+    }
+
+    if (!isMatch && !isBuilder) {
+      return null;
+    }
+  }
 
   const renderField = () => {
     // Arrays (Checkbox Groups)
@@ -93,5 +138,32 @@ export const FieldRenderer: React.FC<FieldRendererProps> = ({
     );
   };
 
-  return <div className={`cdf-builder-field-span-${columnSpan}`}>{renderField()}</div>;
+  return (
+    <div
+      style={{
+        gridColumn: `span ${columnSpan}`,
+        opacity: condition && isBuilder ? 0.6 : 1, // Visually indicate it has a condition in the builder
+        position: 'relative',
+      }}
+    >
+      {condition && isBuilder && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '-8px',
+            right: 0,
+            fontSize: '0.65rem',
+            background: '#e0e7ff',
+            color: '#4338ca',
+            padding: '2px 6px',
+            borderRadius: '4px',
+            fontWeight: 600,
+          }}
+        >
+          Conditional
+        </div>
+      )}
+      {renderField()}
+    </div>
+  );
 };

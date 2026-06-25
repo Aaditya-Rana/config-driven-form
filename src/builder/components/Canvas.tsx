@@ -40,15 +40,24 @@ export const Canvas: React.FC<CanvasProps> = ({
     },
   });
 
-  const themeStyles = theme
+  const effectiveMode = 'light';
+
+  const activeTheme = theme
+    ? {
+        ...theme,
+        ...(theme.light || {}),
+      }
+    : undefined;
+
+  const themeStyles = activeTheme
     ? ({
-        '--cdf-primary': theme.primary,
-        '--cdf-bg': theme.background,
-        '--cdf-text': theme.text,
-        '--cdf-error': theme.error,
-        '--cdf-surface': theme.surface,
-        '--cdf-border': theme.border,
-        '--cdf-radius': theme.radius,
+        '--cdf-primary': activeTheme.primary,
+        '--cdf-bg': activeTheme.background,
+        '--cdf-text': activeTheme.text,
+        '--cdf-error': activeTheme.error,
+        '--cdf-surface': activeTheme.surface,
+        '--cdf-border': activeTheme.border,
+        '--cdf-radius': activeTheme.radius,
       } as React.CSSProperties)
     : {};
 
@@ -57,13 +66,13 @@ export const Canvas: React.FC<CanvasProps> = ({
       style={{
         flex: 1,
         padding: '2rem',
-        backgroundColor: '#f3f4f6',
         overflowY: 'auto',
       }}
       onClick={() => onSelectField('')} // Click outside to deselect
     >
       <div
         className={fields.length > 0 ? 'cdf-form-container' : ''}
+        data-theme={effectiveMode}
         ref={setNodeRef}
         style={{
           ...themeStyles,
@@ -87,12 +96,12 @@ export const Canvas: React.FC<CanvasProps> = ({
             : {}),
         }}
       >
-        {schema?.title && (
+        {fields.length > 0 && schema?.title && (
           <h2 className={`cdf-form-title ${formSettings?.classNames?.title || ''}`}>
             {schema.title}
           </h2>
         )}
-        {schema?.description && (
+        {fields.length > 0 && schema?.description && (
           <p
             className={formSettings?.classNames?.description || ''}
             style={{ color: 'var(--cdf-text-muted)', marginBottom: '1.5rem' }}

@@ -9,6 +9,7 @@ import {
   X,
   Type,
   Code2,
+  List,
 } from 'lucide-react';
 import { FormSettings } from '../useFormBuilder';
 
@@ -178,7 +179,10 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   onUpdate: _onUpdate,
   onUpdateSettings: _onUpdateSettings,
 }) => {
-  const [activeTab, setActiveTab] = useState<'general' | 'validation' | 'design'>('general');
+  const [activeTab, setActiveTab] = useState<'general' | 'validation' | 'design' | 'logic'>(
+    'general',
+  );
+  const [themeColorMode, setThemeColorMode] = useState<'light' | 'dark'>('light');
   const [localOptions, setLocalOptions] = useState<string | null>(null);
 
   const [field, setField] = useState<FieldDef | null>(null);
@@ -452,6 +456,37 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                     />
                   )}
                 </div>
+
+                {/* Theme Mode */}
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.375rem',
+                    marginTop: '0.75rem',
+                  }}
+                >
+                  <label style={{ fontSize: '0.75rem', fontWeight: 500, color: '#6b7280' }}>
+                    Theme Mode
+                  </label>
+                  <select
+                    value={formSettings.themeMode || 'system'}
+                    onChange={(e) =>
+                      onUpdateSettings({ themeMode: e.target.value as 'light' | 'dark' | 'system' })
+                    }
+                    style={{
+                      width: '100%',
+                      padding: '0.5rem',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '0.375rem',
+                      fontSize: '0.875rem',
+                    }}
+                  >
+                    <option value="system">System Default</option>
+                    <option value="light">Light Mode</option>
+                    <option value="dark">Dark Mode</option>
+                  </select>
+                </div>
               </div>
             </div>
 
@@ -470,6 +505,46 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
               >
                 <Palette size={16} /> Theme Colors
               </h4>
+
+              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setThemeColorMode('light')}
+                  style={{
+                    flex: 1,
+                    padding: '0.25rem',
+                    fontSize: '0.75rem',
+                    fontWeight: 500,
+                    borderRadius: '0.25rem',
+                    border: '1px solid',
+                    borderColor: themeColorMode === 'light' ? '#6366f1' : '#d1d5db',
+                    backgroundColor: themeColorMode === 'light' ? '#eef2ff' : 'white',
+                    color: themeColorMode === 'light' ? '#4f46e5' : '#4b5563',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Light Mode
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setThemeColorMode('dark')}
+                  style={{
+                    flex: 1,
+                    padding: '0.25rem',
+                    fontSize: '0.75rem',
+                    fontWeight: 500,
+                    borderRadius: '0.25rem',
+                    border: '1px solid',
+                    borderColor: themeColorMode === 'dark' ? '#6366f1' : '#d1d5db',
+                    backgroundColor: themeColorMode === 'dark' ? '#eef2ff' : 'white',
+                    color: themeColorMode === 'dark' ? '#4f46e5' : '#4b5563',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Dark Mode
+                </button>
+              </div>
+
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 <div
                   style={{
@@ -485,10 +560,22 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <input
                       type="color"
-                      value={formSettings.theme.primary || '#6366f1'}
+                      value={
+                        (themeColorMode === 'light'
+                          ? formSettings.theme.light?.primary
+                          : formSettings.theme.dark?.primary) ||
+                        formSettings.theme.primary ||
+                        '#6366f1'
+                      }
                       onChange={(e) =>
                         onUpdateSettings({
-                          theme: { ...formSettings.theme, primary: e.target.value },
+                          theme: {
+                            ...formSettings.theme,
+                            [themeColorMode]: {
+                              ...(formSettings.theme[themeColorMode] || {}),
+                              primary: e.target.value,
+                            },
+                          },
                         })
                       }
                       style={{
@@ -502,11 +589,23 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                     />
                     <input
                       type="text"
-                      value={formSettings.theme.primary || ''}
+                      value={
+                        (themeColorMode === 'light'
+                          ? formSettings.theme.light?.primary
+                          : formSettings.theme.dark?.primary) ||
+                        formSettings.theme.primary ||
+                        ''
+                      }
                       placeholder="#6366f1"
                       onChange={(e) =>
                         onUpdateSettings({
-                          theme: { ...formSettings.theme, primary: e.target.value },
+                          theme: {
+                            ...formSettings.theme,
+                            [themeColorMode]: {
+                              ...(formSettings.theme[themeColorMode] || {}),
+                              primary: e.target.value,
+                            },
+                          },
                         })
                       }
                       style={{
@@ -535,10 +634,22 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <input
                       type="color"
-                      value={formSettings.theme.background || '#ffffff'}
+                      value={
+                        (themeColorMode === 'light'
+                          ? formSettings.theme.light?.background
+                          : formSettings.theme.dark?.background) ||
+                        formSettings.theme.background ||
+                        '#ffffff'
+                      }
                       onChange={(e) =>
                         onUpdateSettings({
-                          theme: { ...formSettings.theme, background: e.target.value },
+                          theme: {
+                            ...formSettings.theme,
+                            [themeColorMode]: {
+                              ...(formSettings.theme[themeColorMode] || {}),
+                              background: e.target.value,
+                            },
+                          },
                         })
                       }
                       style={{
@@ -552,11 +663,171 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                     />
                     <input
                       type="text"
-                      value={formSettings.theme.background || ''}
+                      value={
+                        (themeColorMode === 'light'
+                          ? formSettings.theme.light?.background
+                          : formSettings.theme.dark?.background) ||
+                        formSettings.theme.background ||
+                        ''
+                      }
                       placeholder="#ffffff"
                       onChange={(e) =>
                         onUpdateSettings({
-                          theme: { ...formSettings.theme, background: e.target.value },
+                          theme: {
+                            ...formSettings.theme,
+                            [themeColorMode]: {
+                              ...(formSettings.theme[themeColorMode] || {}),
+                              background: e.target.value,
+                            },
+                          },
+                        })
+                      }
+                      style={{
+                        width: '80px',
+                        padding: '0.25rem 0.5rem',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '0.25rem',
+                        fontSize: '0.75rem',
+                        fontFamily: 'monospace',
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '0.5rem',
+                  }}
+                >
+                  <label style={{ fontSize: '0.875rem', fontWeight: 500, color: '#4b5563' }}>
+                    Surface Color (Fields)
+                  </label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <input
+                      type="color"
+                      value={
+                        (themeColorMode === 'light'
+                          ? formSettings.theme.light?.surface
+                          : formSettings.theme.dark?.surface) ||
+                        formSettings.theme.surface ||
+                        '#ffffff'
+                      }
+                      onChange={(e) =>
+                        onUpdateSettings({
+                          theme: {
+                            ...formSettings.theme,
+                            [themeColorMode]: {
+                              ...(formSettings.theme[themeColorMode] || {}),
+                              surface: e.target.value,
+                            },
+                          },
+                        })
+                      }
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        padding: '0',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                      }}
+                    />
+                    <input
+                      type="text"
+                      value={
+                        (themeColorMode === 'light'
+                          ? formSettings.theme.light?.surface
+                          : formSettings.theme.dark?.surface) ||
+                        formSettings.theme.surface ||
+                        ''
+                      }
+                      placeholder="#ffffff"
+                      onChange={(e) =>
+                        onUpdateSettings({
+                          theme: {
+                            ...formSettings.theme,
+                            [themeColorMode]: {
+                              ...(formSettings.theme[themeColorMode] || {}),
+                              surface: e.target.value,
+                            },
+                          },
+                        })
+                      }
+                      style={{
+                        width: '80px',
+                        padding: '0.25rem 0.5rem',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '0.25rem',
+                        fontSize: '0.75rem',
+                        fontFamily: 'monospace',
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '0.5rem',
+                  }}
+                >
+                  <label style={{ fontSize: '0.875rem', fontWeight: 500, color: '#4b5563' }}>
+                    Text Color
+                  </label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <input
+                      type="color"
+                      value={
+                        (themeColorMode === 'light'
+                          ? formSettings.theme.light?.text
+                          : formSettings.theme.dark?.text) ||
+                        formSettings.theme.text ||
+                        '#000000'
+                      }
+                      onChange={(e) =>
+                        onUpdateSettings({
+                          theme: {
+                            ...formSettings.theme,
+                            [themeColorMode]: {
+                              ...(formSettings.theme[themeColorMode] || {}),
+                              text: e.target.value,
+                            },
+                          },
+                        })
+                      }
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        padding: '0',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                      }}
+                    />
+                    <input
+                      type="text"
+                      value={
+                        (themeColorMode === 'light'
+                          ? formSettings.theme.light?.text
+                          : formSettings.theme.dark?.text) ||
+                        formSettings.theme.text ||
+                        ''
+                      }
+                      placeholder="#000000"
+                      onChange={(e) =>
+                        onUpdateSettings({
+                          theme: {
+                            ...formSettings.theme,
+                            [themeColorMode]: {
+                              ...(formSettings.theme[themeColorMode] || {}),
+                              text: e.target.value,
+                            },
+                          },
                         })
                       }
                       style={{
@@ -991,6 +1262,26 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
               }}
             >
               <Paintbrush size={14} /> Design
+            </button>
+            <button
+              onClick={() => setActiveTab('logic')}
+              style={{
+                flex: 1,
+                padding: '0.75rem 0',
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                backgroundColor: 'transparent',
+                border: 'none',
+                borderBottom: `2px solid ${activeTab === 'logic' ? '#6366f1' : 'transparent'}`,
+                color: activeTab === 'logic' ? '#6366f1' : '#6b7280',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.25rem',
+              }}
+            >
+              <List size={14} /> Logic
             </button>
           </div>
         </div>
@@ -1633,6 +1924,155 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                 </div>
               </div>
             </>
+          )}
+
+          {activeTab === 'logic' && (
+            <div
+              style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}
+            >
+              <div>
+                <h4
+                  style={{
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    color: '#111827',
+                    marginBottom: '1rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                  }}
+                >
+                  <List size={16} /> Conditional Logic
+                </h4>
+                <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '1rem' }}>
+                  Show or hide this field based on the value of another field.
+                </p>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '1rem',
+                    padding: '1rem',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '0.5rem',
+                    backgroundColor: '#f9fafb',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <input
+                      type="checkbox"
+                      id="enable-condition"
+                      checked={!!field.uiSchema?.['ui:condition']}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          handleUiSchemaChange('ui:condition', {
+                            targetField: '',
+                            operator: 'is',
+                            expectedValue: '',
+                          });
+                        } else {
+                          handleUiSchemaChange('ui:condition', undefined);
+                        }
+                      }}
+                    />
+                    <label
+                      htmlFor="enable-condition"
+                      style={{ fontSize: '0.875rem', fontWeight: 500, color: '#374151' }}
+                    >
+                      Enable Conditional Logic
+                    </label>
+                  </div>
+
+                  {field.uiSchema?.['ui:condition'] && (
+                    <>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: 500, color: '#6b7280' }}>
+                          Target Field (Key)
+                        </label>
+                        <input
+                          type="text"
+                          value={field.uiSchema['ui:condition'].targetField || ''}
+                          onChange={(e) =>
+                            handleUiSchemaChange('ui:condition', {
+                              ...field.uiSchema?.['ui:condition'],
+                              targetField: e.target.value,
+                            })
+                          }
+                          placeholder="e.g. newsletter"
+                          style={{
+                            width: '100%',
+                            padding: '0.5rem',
+                            border: '1px solid #d1d5db',
+                            borderRadius: '0.375rem',
+                            fontSize: '0.875rem',
+                          }}
+                        />
+                      </div>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                        <label style={{ fontSize: '0.75rem', fontWeight: 500, color: '#6b7280' }}>
+                          Operator
+                        </label>
+                        <select
+                          value={field.uiSchema['ui:condition'].operator || 'is'}
+                          onChange={(e) =>
+                            handleUiSchemaChange('ui:condition', {
+                              ...field.uiSchema?.['ui:condition'],
+                              operator: e.target.value,
+                            })
+                          }
+                          style={{
+                            width: '100%',
+                            padding: '0.5rem',
+                            border: '1px solid #d1d5db',
+                            borderRadius: '0.375rem',
+                            fontSize: '0.875rem',
+                          }}
+                        >
+                          <option value="is">Is (Equals)</option>
+                          <option value="isNot">Is Not</option>
+                          <option value="contains">Contains</option>
+                          <option value="doesNotContain">Does Not Contain</option>
+                          <option value="isEmpty">Is Empty</option>
+                          <option value="isNotEmpty">Is Not Empty</option>
+                          <option value="gt">Greater Than</option>
+                          <option value="lt">Less Than</option>
+                        </select>
+                      </div>
+
+                      {!['isEmpty', 'isNotEmpty'].includes(
+                        field.uiSchema['ui:condition'].operator,
+                      ) && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                          <label style={{ fontSize: '0.75rem', fontWeight: 500, color: '#6b7280' }}>
+                            Expected Value
+                          </label>
+                          <input
+                            type="text"
+                            value={field.uiSchema['ui:condition'].expectedValue || ''}
+                            onChange={(e) =>
+                              handleUiSchemaChange('ui:condition', {
+                                ...field.uiSchema?.['ui:condition'],
+                                expectedValue: e.target.value,
+                              })
+                            }
+                            placeholder="Value to match"
+                            style={{
+                              width: '100%',
+                              padding: '0.5rem',
+                              border: '1px solid #d1d5db',
+                              borderRadius: '0.375rem',
+                              fontSize: '0.875rem',
+                            }}
+                          />
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
           )}
         </div>
 

@@ -17,6 +17,9 @@ Stop writing thousands of lines of boilerplate form code. Define your data struc
 - 🏗️ **Multi-Column Layouts:** Easily build complex 2, 3, or 4-column grid layouts using the `uiSchema`.
 - 🧩 **Rich Field Types:** Natively supports Text, Numbers, Passwords, Dropdowns, Radios, Checkboxes, File Uploads, and a Tiptap Rich Text Editor!
 - 🏗️ **Visual Form Builder:** Includes a powerful, Strapi-like Drag-and-Drop builder to visually construct schemas and UI schemas without writing code!
+- 🔄 **Multi-Step Forms:** Easily break down massive forms into manageable steps with progress tracking!
+- 🔀 **Conditional Logic:** Show or hide fields dynamically based on the real-time values of other fields!
+- 🌗 **Advanced Theme Engine:** Granularly control Light and Dark mode color variables independently.
 
 ---
 
@@ -197,6 +200,9 @@ You can embed this builder into your own admin panels, let users visually constr
 - **👆 Touch Drag & Drop**: Flawless touch screen dragging with intelligent distance constraints to prevent accidental taps from canceling your drag.
 - **🎨 Live Typography & Sizing Engine**: Instantly preview field Width, Height, Text Size, and Alignments directly inside the builder. No external TailwindCSS configuration required—everything runs out of the box!
 - **📐 Visual Grid Layouts**: Easily build complex 1-to-4 column responsive forms. Click and drag a field's edges to visually snap its width across multiple grid columns in real-time.
+- **🔄 Tabbed Multi-Step Forms**: Break complex forms into multiple pages with a single click. Navigate via tabs and add infinite steps instantly.
+- **🔀 Strapi-like Conditional Logic**: Attach complex visibility rules to any field. Hide/Show fields based on real-time values entered in other fields!
+- **🌗 Light/Dark Mode Controls**: Granularly control global styling explicitly for Light and Dark modes directly from the Properties Panel.
 
 ```tsx
 import React from 'react';

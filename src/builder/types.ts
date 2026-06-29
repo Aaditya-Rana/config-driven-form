@@ -25,6 +25,15 @@ export interface FieldDef {
   isRequired?: boolean;
 }
 
+export interface CustomFieldDef {
+  id: string; // Unique identifier for the custom field
+  title: string; // Display name in the toolbox
+  type: BuilderFieldType; // The base builder type it uses
+  schema: JSONSchema;
+  uiSchema?: UISchema;
+  icon?: string; // Optional lucide-react icon name
+}
+
 // Initial templates for dropping new fields
 export const FIELD_TEMPLATES: Record<BuilderFieldType, Omit<FieldDef, 'id' | 'key'>> = {
   text: {

@@ -120,3 +120,28 @@ export const EnterpriseComplexLayout: Story = {
     },
   },
 };
+
+export const WithCustomFields: Story = {
+  args: {
+    customFields: [
+      {
+        id: 'cf_1',
+        title: 'Country List',
+        type: 'select',
+        schema: {
+          type: 'string',
+          title: 'Select Country',
+          enum: ['United States', 'Canada', 'United Kingdom', 'Australia', 'India'],
+        },
+        icon: 'Settings',
+      },
+    ],
+    onCustomFieldsChange: (fields) => {
+      console.log('Custom Fields updated:', fields);
+      alert('Custom fields updated! Check console.');
+    },
+    onSave: () => {
+      alert('Form Saved!');
+    },
+  },
+};

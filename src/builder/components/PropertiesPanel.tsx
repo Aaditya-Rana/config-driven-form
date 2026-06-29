@@ -10,6 +10,7 @@ import {
   Type,
   Code2,
   List,
+  BookmarkPlus,
 } from 'lucide-react';
 import { FormSettings } from '../useFormBuilder';
 
@@ -169,6 +170,7 @@ interface PropertiesPanelProps {
   onClose: () => void;
   onUpdate: (id: string, updates: Partial<FieldDef>) => void;
   onUpdateSettings: (updates: Partial<FormSettings>) => void;
+  onSaveAsCustomField?: (field: FieldDef) => void;
 }
 
 export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
@@ -178,6 +180,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
   onClose,
   onUpdate: _onUpdate,
   onUpdateSettings: _onUpdateSettings,
+  onSaveAsCustomField,
 }) => {
   const [activeTab, setActiveTab] = useState<'general' | 'validation' | 'design' | 'logic'>(
     'general',
@@ -1193,12 +1196,33 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
             <h3 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#111827', margin: 0 }}>
               Field Settings
             </h3>
-            <button
-              onClick={onClose}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280' }}
-            >
-              <X size={20} />
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              {onSaveAsCustomField && (
+                <button
+                  onClick={() => onSaveAsCustomField(field)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.375rem',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    color: '#6366f1',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                  }}
+                  title="Save as Reusable Field"
+                >
+                  <BookmarkPlus size={16} /> Save as Reusable
+                </button>
+              )}
+              <button
+                onClick={onClose}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
           </div>
 
           {/* Tabs */}

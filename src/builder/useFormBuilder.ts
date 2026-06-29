@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { arrayMove } from '@dnd-kit/sortable';
-import { FieldDef, BuilderFieldType, FIELD_TEMPLATES } from './types';
+import { FieldDef, BuilderFieldType, FIELD_TEMPLATES, CustomFieldDef } from './types';
 import { JSONSchema, UISchema } from '../types/schema';
 
 export interface FormSettings {
@@ -12,6 +12,8 @@ export interface FormSettings {
     text?: string;
     error?: string;
     radius?: string;
+    surface?: string;
+    border?: string;
     light?: {
       primary?: string;
       background?: string;
@@ -91,36 +93,45 @@ export const useFormBuilder = (
 
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
 
-  const addField = useCallback((type: BuilderFieldType, index?: number, step?: number) => {
-    const template = FIELD_TEMPLATES[type];
+  const addField = useCallback(
+    (
+      type: BuilderFieldType | string,
+      index?: number,
+      step?: number,
+      customTemplate?: CustomFieldDef,
+    ) => {
+      const template = customTemplate || FIELD_TEMPLATES[type as BuilderFieldType];
+      if (!template) return;
 
-    let initialUiSchema = template.uiSchema ? JSON.parse(JSON.stringify(template.uiSchema)) : {};
-    if (step !== undefined) {
-      initialUiSchema['ui:step'] = step;
-    }
-    if (Object.keys(initialUiSchema).length === 0) {
-      initialUiSchema = undefined;
-    }
-
-    const newField: FieldDef = {
-      id: uuidv4(),
-      key: `field_${Date.now()}`,
-      type,
-      // Deep clone template schemas
-      schema: JSON.parse(JSON.stringify(template.schema)),
-      uiSchema: initialUiSchema,
-    };
-
-    setFields((prev) => {
-      if (typeof index === 'number') {
-        const newFields = [...prev];
-        newFields.splice(index, 0, newField);
-        return newFields;
+      let initialUiSchema = template.uiSchema ? JSON.parse(JSON.stringify(template.uiSchema)) : {};
+      if (step !== undefined) {
+        initialUiSchema['ui:step'] = step;
       }
-      return [...prev, newField];
-    });
-    setSelectedFieldId(newField.id);
-  }, []);
+      if (Object.keys(initialUiSchema).length === 0) {
+        initialUiSchema = undefined;
+      }
+
+      const newField: FieldDef = {
+        id: uuidv4(),
+        key: `${customTemplate ? customTemplate.type : type}_${Math.random().toString(36).substring(2, 6)}`,
+        type: (customTemplate ? customTemplate.type : type) as BuilderFieldType,
+        // Deep clone template schemas
+        schema: JSON.parse(JSON.stringify(template.schema)),
+        uiSchema: initialUiSchema,
+      };
+
+      setFields((prev) => {
+        if (typeof index === 'number') {
+          const newFields = [...prev];
+          newFields.splice(index, 0, newField);
+          return newFields;
+        }
+        return [...prev, newField];
+      });
+      setSelectedFieldId(newField.id);
+    },
+    [],
+  );
 
   const removeField = useCallback(
     (id: string) => {

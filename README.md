@@ -203,24 +203,33 @@ You can embed this builder into your own admin panels, let users visually constr
 - **🔄 Tabbed Multi-Step Forms**: Break complex forms into multiple pages with a single click. Navigate via tabs and add infinite steps instantly.
 - **🔀 Strapi-like Conditional Logic**: Attach complex visibility rules to any field. Hide/Show fields based on real-time values entered in other fields!
 - **🌗 Light/Dark Mode Controls**: Granularly control global styling explicitly for Light and Dark modes directly from the Properties Panel.
+- **♻️ Reusable Custom Fields**: Save any field configuration to a custom toolbox and reuse it infinitely! Fully controlled components allow you to persist custom fields directly to your database.
 
 ```tsx
-import React from 'react';
-import { FormBuilder } from 'config-driven-form';
+import React, { useState } from 'react';
+import { FormBuilder, CustomFieldDef } from 'config-driven-form';
 import 'config-driven-form/dist/index.css';
 
 export default function AdminFormBuilder() {
+  const [customFields, setCustomFields] = useState<CustomFieldDef[]>([]);
+
   return (
     <div style={{ height: '100vh', width: '100vw' }}>
       <FormBuilder
         // Optional: Pass existing schemas to edit them!
         // initialSchema={existingSchema}
         // initialUiSchema={existingUiSchema}
+
+        // Pass customFields state to persist them in your database!
+        customFields={customFields}
+        onCustomFieldsChange={(fields) => {
+          setCustomFields(fields);
+          // Save to your database here!
+        }}
         onSave={(schema, uiSchema, formSettings) => {
           console.log('Generated Schema:', schema);
           console.log('Generated UI Schema:', uiSchema);
           console.log('Global Form Settings:', formSettings);
-
           // Save to your database here!
         }}
       />

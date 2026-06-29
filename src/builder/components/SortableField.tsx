@@ -15,7 +15,6 @@ interface SortableFieldProps {
   onDuplicate: () => void;
   onEdit: () => void;
   onUpdateColumnSpan: (span: number) => void;
-  stepIndex?: number;
 }
 
 export const SortableField: React.FC<SortableFieldProps> = ({
@@ -27,7 +26,6 @@ export const SortableField: React.FC<SortableFieldProps> = ({
   onDuplicate,
   onEdit,
   onUpdateColumnSpan,
-  stepIndex,
 }) => {
   const [isHovered, setIsHovered] = React.useState(false);
 
@@ -150,37 +148,17 @@ export const SortableField: React.FC<SortableFieldProps> = ({
         <div style={{ position: 'absolute', inset: 0, zIndex: 1, cursor: 'pointer' }} />
 
         <div style={{ pointerEvents: 'none' }}>
-          {field.type === 'step' ? (
-            <div
-              style={{
-                padding: '1rem',
-                textAlign: 'center',
-                border: '2px dashed #d1d5db',
-                borderRadius: '0.5rem',
-                color: '#6b7280',
-                fontWeight: 600,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.5rem',
-                backgroundColor: '#f9fafb',
-              }}
-            >
-              Step {stepIndex} Break
-            </div>
-          ) : (
-            <FormProvider {...methods}>
-              <form>
-                <FieldRenderer
-                  name={field.key}
-                  schema={field.schema}
-                  uiSchema={field.uiSchema}
-                  isRequired={field.isRequired}
-                  isBuilder={true}
-                />
-              </form>
-            </FormProvider>
-          )}
+          <FormProvider {...methods}>
+            <form>
+              <FieldRenderer
+                name={field.key}
+                schema={field.schema}
+                uiSchema={field.uiSchema}
+                isRequired={field.isRequired}
+                isBuilder={true}
+              />
+            </form>
+          </FormProvider>
         </div>
       </div>
 

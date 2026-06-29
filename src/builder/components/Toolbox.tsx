@@ -16,7 +16,12 @@ import {
   Calendar,
   CalendarClock,
   Clock,
+  Settings,
+  Plus,
+  Edit2,
+  Trash2,
 } from 'lucide-react';
+import { CustomFieldDef } from '../types';
 
 const TOOLS: { type: BuilderFieldType; label: string; icon: React.ReactNode }[] = [
   { type: 'text', label: 'Text Field', icon: <Type size={18} /> },
@@ -36,16 +41,20 @@ const TOOLS: { type: BuilderFieldType; label: string; icon: React.ReactNode }[] 
 ];
 
 const DraggableTool: React.FC<{
-  type: BuilderFieldType;
+  type: string;
   label: string;
   icon: React.ReactNode;
-  onAddField: (type: BuilderFieldType) => void;
-}> = ({ type, label, icon, onAddField }) => {
+  customField?: CustomFieldDef;
+  onAddField: (type: string, customField?: CustomFieldDef) => void;
+  onEdit?: (id: string) => void;
+  onRemove?: (id: string) => void;
+}> = ({ type, label, icon, customField, onAddField, onEdit, onRemove }) => {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-    id: `toolbox-${type}`,
+    id: customField ? `toolbox-custom-${customField.id}` : `toolbox-${type}`,
     data: {
       type: 'ToolboxItem',
       fieldType: type,
+      customField,
     },
   });
 
@@ -54,7 +63,7 @@ const DraggableTool: React.FC<{
       ref={setNodeRef}
       {...listeners}
       {...attributes}
-      onClick={() => onAddField(type)}
+      onClick={() => onAddField(type, customField)}
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -79,14 +88,67 @@ const DraggableTool: React.FC<{
       }}
       className="cdf-toolbox-item"
     >
-      <div style={{ color: '#6366f1' }}>{icon}</div>
-      <span style={{ fontSize: '0.875rem', fontWeight: 500, color: '#374151' }}>{label}</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1 }}>
+        <div style={{ color: '#6366f1' }}>{icon}</div>
+        <span style={{ fontSize: '0.875rem', fontWeight: 500, color: '#374151' }}>{label}</span>
+      </div>
+
+      {customField && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          {onEdit && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit(customField.id);
+              }}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: '#6b7280',
+                padding: '0.25rem',
+              }}
+              title="Edit Name"
+            >
+              <Edit2 size={14} />
+            </button>
+          )}
+          {onRemove && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemove(customField.id);
+              }}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: '#ef4444',
+                padding: '0.25rem',
+              }}
+              title="Remove"
+            >
+              <Trash2 size={14} />
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 };
 
-export const Toolbox: React.FC<{ onAddField: (type: BuilderFieldType) => void }> = ({
+export const Toolbox: React.FC<{
+  onAddField: (type: string, customField?: CustomFieldDef) => void;
+  customFields?: CustomFieldDef[];
+  onCreateCustomField?: () => void;
+  onEditCustomField?: (id: string) => void;
+  onRemoveCustomField?: (id: string) => void;
+}> = ({
   onAddField,
+  customFields = [],
+  onCreateCustomField,
+  onEditCustomField,
+  onRemoveCustomField,
 }) => {
   return (
     <div className="cdf-toolbox">
@@ -104,6 +166,65 @@ export const Toolbox: React.FC<{ onAddField: (type: BuilderFieldType) => void }>
               />
             ))}
           </div>
+        </div>
+
+        <div style={{ marginTop: '1.5rem' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: '0.75rem',
+            }}
+          >
+            <h3 className="cdf-toolbox-group-title" style={{ margin: 0 }}>
+              Custom Fields
+            </h3>
+            {onCreateCustomField && (
+              <button
+                onClick={onCreateCustomField}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: '#6366f1',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '0.25rem',
+                }}
+                title="Create Custom Field"
+              >
+                <Plus size={16} />
+              </button>
+            )}
+          </div>
+          {customFields.length > 0 ? (
+            <div className="cdf-toolbox-items">
+              {customFields.map((field) => (
+                <DraggableTool
+                  key={field.id}
+                  type={field.type}
+                  label={field.title}
+                  icon={<Settings size={18} />}
+                  customField={field}
+                  onAddField={onAddField}
+                  onEdit={onEditCustomField}
+                  onRemove={onRemoveCustomField}
+                />
+              ))}
+            </div>
+          ) : (
+            <div
+              style={{
+                fontSize: '0.75rem',
+                color: '#6b7280',
+                fontStyle: 'italic',
+                padding: '0.5rem',
+              }}
+            >
+              No custom fields yet.
+            </div>
+          )}
         </div>
       </div>
     </div>

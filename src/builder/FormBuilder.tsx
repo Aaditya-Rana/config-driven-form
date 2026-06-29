@@ -17,7 +17,7 @@ import { useFormBuilder, FormSettings } from './useFormBuilder';
 import { Toolbox } from './components/Toolbox';
 import { Canvas } from './components/Canvas';
 import { PropertiesPanel } from './components/PropertiesPanel';
-import { BuilderFieldType } from './types';
+import { BuilderFieldType, CustomFieldDef, FIELD_TEMPLATES } from './types';
 import { Save, Code2, Eye, LayoutTemplate, Settings } from 'lucide-react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { SchemaForm } from '../components/SchemaForm';
@@ -34,6 +34,8 @@ export interface FormBuilderProps {
     uiSchema: Record<string, UISchema>,
     formSettings: FormSettings,
   ) => void;
+  customFields?: CustomFieldDef[];
+  onCustomFieldsChange?: (fields: CustomFieldDef[]) => void;
 }
 
 export const FormBuilder: React.FC<FormBuilderProps> = ({
@@ -42,6 +44,8 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
   initialColumns,
   initialTheme,
   onSave,
+  customFields: propCustomFields,
+  onCustomFieldsChange,
 }) => {
   const {
     fields,
@@ -63,6 +67,34 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
   const [previewDevice, setPreviewDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const [isPropertiesDialogOpen, setIsPropertiesDialogOpen] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
+
+  const [localCustomFields, setLocalCustomFields] = useState<CustomFieldDef[]>([]);
+  const customFields = propCustomFields !== undefined ? propCustomFields : localCustomFields;
+  const setCustomFields = onCustomFieldsChange || setLocalCustomFields;
+
+  const [saveAsCustomFieldData, setSaveAsCustomFieldData] = useState<any | null>(null);
+  const [customFieldNameInput, setCustomFieldNameInput] = useState('');
+
+  const [createCustomFieldModalOpen, setCreateCustomFieldModalOpen] = useState(false);
+  const [createCustomFieldBaseType, setCreateCustomFieldBaseType] =
+    useState<BuilderFieldType>('text');
+  const [editingCustomFieldId, setEditingCustomFieldId] = useState<string | null>(null);
+
+  const editingCustomField = React.useMemo(
+    () => customFields.find((f) => f.id === editingCustomFieldId),
+    [customFields, editingCustomFieldId],
+  );
+  const customFieldToEdit = React.useMemo(() => {
+    if (!editingCustomField) return null;
+    return {
+      id: editingCustomField.id,
+      key: editingCustomField.id,
+      type: editingCustomField.type as BuilderFieldType,
+      schema: { ...editingCustomField.schema, title: editingCustomField.title },
+      uiSchema: editingCustomField.uiSchema,
+      isRequired: false,
+    };
+  }, [editingCustomField]);
 
   const maxStep = React.useMemo(() => {
     return fields.reduce((max, field) => {
@@ -116,6 +148,7 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
           active.data.current.fieldType as BuilderFieldType,
           overIndex >= 0 ? overIndex : undefined,
           activeStep,
+          active.data.current.customField,
         );
       }
       return;
@@ -395,7 +428,19 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
             onDragEnd={handleDragEnd}
           >
             {/* Left: Toolbox */}
-            <Toolbox onAddField={(type) => addField(type, undefined, activeStep)} />
+            <Toolbox
+              customFields={customFields}
+              onAddField={(type, customTemplate) =>
+                addField(type, undefined, activeStep, customTemplate)
+              }
+              onCreateCustomField={() => {
+                setCustomFieldNameInput('');
+                setCreateCustomFieldBaseType('text');
+                setCreateCustomFieldModalOpen(true);
+              }}
+              onEditCustomField={(id) => setEditingCustomFieldId(id)}
+              onRemoveCustomField={(id) => setCustomFields(customFields.filter((f) => f.id !== id))}
+            />
 
             {/* Center: Canvas and Tabs */}
             <div
@@ -543,13 +588,313 @@ export const FormBuilder: React.FC<FormBuilderProps> = ({
 
         {/* Modal Dialog Properties */}
         <PropertiesPanel
-          field={selectedField || null}
+          field={editingCustomFieldId ? customFieldToEdit : selectedField || null}
           formSettings={formSettings}
-          isOpen={isPropertiesDialogOpen}
-          onClose={() => setIsPropertiesDialogOpen(false)}
-          onUpdate={updateField}
+          isOpen={isPropertiesDialogOpen || !!editingCustomFieldId}
+          onClose={() => {
+            setIsPropertiesDialogOpen(false);
+            setEditingCustomFieldId(null);
+          }}
+          onUpdate={(id, updates) => {
+            if (editingCustomFieldId) {
+              setCustomFields(
+                customFields.map((cf) =>
+                  cf.id === id
+                    ? {
+                        ...cf,
+                        title: updates.schema?.title || cf.title,
+                        schema: updates.schema || cf.schema,
+                        uiSchema: updates.uiSchema || cf.uiSchema,
+                      }
+                    : cf,
+                ),
+              );
+            } else {
+              updateField(id, updates);
+            }
+          }}
           onUpdateSettings={updateFormSettings}
+          onSaveAsCustomField={(field) => {
+            setSaveAsCustomFieldData(field);
+            setCustomFieldNameInput(field.schema.title || 'Custom Field');
+          }}
         />
+
+        {/* Save as Custom Field Modal */}
+        {saveAsCustomFieldData && (
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 100,
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '1rem',
+            }}
+            onClick={() => setSaveAsCustomFieldData(null)}
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                width: '100%',
+                maxWidth: '400px',
+                backgroundColor: 'white',
+                borderRadius: '0.75rem',
+                display: 'flex',
+                flexDirection: 'column',
+                boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)',
+                padding: '1.5rem',
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: '1.125rem',
+                  fontWeight: 600,
+                  color: '#111827',
+                  margin: '0 0 1rem 0',
+                }}
+              >
+                Save as Reusable Field
+              </h3>
+              <p style={{ fontSize: '0.875rem', color: '#4b5563', marginBottom: '1rem' }}>
+                Enter a name for this custom field. It will be available in the toolbox for future
+                use.
+              </p>
+              <input
+                type="text"
+                value={customFieldNameInput}
+                onChange={(e) => setCustomFieldNameInput(e.target.value)}
+                autoFocus
+                style={{
+                  width: '100%',
+                  padding: '0.5rem 0.75rem',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '0.375rem',
+                  fontSize: '0.875rem',
+                  marginBottom: '1.5rem',
+                  boxSizing: 'border-box',
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && customFieldNameInput.trim()) {
+                    const newCustomField: CustomFieldDef = {
+                      id: `custom_${Date.now()}`,
+                      title: customFieldNameInput.trim(),
+                      type: saveAsCustomFieldData.type,
+                      schema: saveAsCustomFieldData.schema,
+                      uiSchema: saveAsCustomFieldData.uiSchema,
+                    };
+                    setCustomFields([...customFields, newCustomField]);
+                    setSaveAsCustomFieldData(null);
+                  }
+                }}
+              />
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                <button
+                  onClick={() => setSaveAsCustomFieldData(null)}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    backgroundColor: 'white',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '0.375rem',
+                    color: '#374151',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  disabled={!customFieldNameInput.trim()}
+                  onClick={() => {
+                    if (customFieldNameInput.trim()) {
+                      const newCustomField: CustomFieldDef = {
+                        id: `custom_${Date.now()}`,
+                        title: customFieldNameInput.trim(),
+                        type: saveAsCustomFieldData.type,
+                        schema: saveAsCustomFieldData.schema,
+                        uiSchema: saveAsCustomFieldData.uiSchema,
+                      };
+                      setCustomFields([...customFields, newCustomField]);
+                      setSaveAsCustomFieldData(null);
+                    }
+                  }}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    backgroundColor: '#6366f1',
+                    border: 'none',
+                    borderRadius: '0.375rem',
+                    color: 'white',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    cursor: customFieldNameInput.trim() ? 'pointer' : 'not-allowed',
+                    opacity: customFieldNameInput.trim() ? 1 : 0.5,
+                  }}
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Create Custom Field Modal */}
+        {createCustomFieldModalOpen && (
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 100,
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '1rem',
+            }}
+            onClick={() => setCreateCustomFieldModalOpen(false)}
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                width: '100%',
+                maxWidth: '400px',
+                backgroundColor: 'white',
+                borderRadius: '0.75rem',
+                display: 'flex',
+                flexDirection: 'column',
+                boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)',
+                padding: '1.5rem',
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: '1.125rem',
+                  fontWeight: 600,
+                  color: '#111827',
+                  margin: '0 0 1rem 0',
+                }}
+              >
+                Create Custom Field
+              </h3>
+              <p style={{ fontSize: '0.875rem', color: '#4b5563', marginBottom: '1rem' }}>
+                Configure a new reusable field from scratch.
+              </p>
+
+              <label
+                style={{
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  color: '#374151',
+                  marginBottom: '0.5rem',
+                }}
+              >
+                Field Name
+              </label>
+              <input
+                type="text"
+                value={customFieldNameInput}
+                onChange={(e) => setCustomFieldNameInput(e.target.value)}
+                autoFocus
+                style={{
+                  width: '100%',
+                  padding: '0.5rem 0.75rem',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '0.375rem',
+                  fontSize: '0.875rem',
+                  marginBottom: '1rem',
+                  boxSizing: 'border-box',
+                }}
+              />
+
+              <label
+                style={{
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  color: '#374151',
+                  marginBottom: '0.5rem',
+                }}
+              >
+                Base Type
+              </label>
+              <select
+                value={createCustomFieldBaseType}
+                onChange={(e) => setCreateCustomFieldBaseType(e.target.value as BuilderFieldType)}
+                style={{
+                  width: '100%',
+                  padding: '0.5rem 0.75rem',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '0.375rem',
+                  fontSize: '0.875rem',
+                  marginBottom: '1.5rem',
+                  boxSizing: 'border-box',
+                }}
+              >
+                {Object.keys(FIELD_TEMPLATES).map((type) => (
+                  <option key={type} value={type}>
+                    {FIELD_TEMPLATES[type as BuilderFieldType].schema.title || type}
+                  </option>
+                ))}
+              </select>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+                <button
+                  onClick={() => setCreateCustomFieldModalOpen(false)}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    backgroundColor: 'white',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '0.375rem',
+                    color: '#374151',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  disabled={!customFieldNameInput.trim()}
+                  onClick={() => {
+                    if (customFieldNameInput.trim()) {
+                      const template = FIELD_TEMPLATES[createCustomFieldBaseType];
+                      const newCustomField: CustomFieldDef = {
+                        id: `custom_${Date.now()}`,
+                        title: customFieldNameInput.trim(),
+                        type: createCustomFieldBaseType,
+                        schema: JSON.parse(
+                          JSON.stringify({
+                            ...template.schema,
+                            title: customFieldNameInput.trim(),
+                          }),
+                        ),
+                        uiSchema: template.uiSchema
+                          ? JSON.parse(JSON.stringify(template.uiSchema))
+                          : undefined,
+                      };
+                      setCustomFields([...customFields, newCustomField]);
+                      setCreateCustomFieldModalOpen(false);
+                    }
+                  }}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    backgroundColor: '#6366f1',
+                    border: 'none',
+                    borderRadius: '0.375rem',
+                    color: 'white',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    cursor: customFieldNameInput.trim() ? 'pointer' : 'not-allowed',
+                    opacity: customFieldNameInput.trim() ? 1 : 0.5,
+                  }}
+                >
+                  Create
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
